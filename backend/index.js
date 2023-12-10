@@ -33,6 +33,15 @@ app.post("/backend/postWoord/:groepid/:uitspraak/:kanji/:betekenis/:notitie", (r
 app.post("/backend/postKanji/:groepid/:uitspraak/:betekenis/:kanji/:img/:notitie", (req, res) => {
   databasehelper.PostKanji(req, res, req.params.groepid,req.params.uitspraak,req.params.betekenis,req.params.kanji,req.params.img,req.params.notitie)
 })
+app.get("/backend/getGroups",(req,res)=>{
+  databasehelper.GetGroups(req,res)
+})
+app.post("/backend/addGroup/:name",(req,res)=>{
+  databasehelper.AddGroup(req,res,req.params.name)
+})
+app.delete("/backend/deleteGroup/:id",(req,res)=>{
+  databasehelper.DeleteGroup(req,res,req.params.id)
+})
 app.listen(port, () => {
   console.log(`Backend app listening on port ${port}`)
 })

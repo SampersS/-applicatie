@@ -2,7 +2,7 @@ CREATE DATABASE  IF NOT EXISTS `db_applicatie` /*!40100 DEFAULT CHARACTER SET ut
 USE `db_applicatie`;
 -- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
 --
--- Host: localhost    Database: db_applicatie
+-- Host: 127.0.0.1    Database: db_applicatie
 -- ------------------------------------------------------
 -- Server version	8.0.34
 
@@ -37,17 +37,8 @@ CREATE TABLE `charakter_tabel` (
   `foutwaarde_naar_betekenis` int DEFAULT NULL,
   `notitie` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`idcharakter_tabel`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `charakter_tabel`
---
-
-LOCK TABLES `charakter_tabel` WRITE;
-/*!40000 ALTER TABLE `charakter_tabel` DISABLE KEYS */;
-/*!40000 ALTER TABLE `charakter_tabel` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `groep_namen`
@@ -59,19 +50,9 @@ DROP TABLE IF EXISTS `groep_namen`;
 CREATE TABLE `groep_namen` (
   `idgroep_namen` int NOT NULL AUTO_INCREMENT,
   `naam` varchar(45) DEFAULT NULL,
-  `kanji` int DEFAULT NULL,
   PRIMARY KEY (`idgroep_namen`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `groep_namen`
---
-
-LOCK TABLES `groep_namen` WRITE;
-/*!40000 ALTER TABLE `groep_namen` DISABLE KEYS */;
-/*!40000 ALTER TABLE `groep_namen` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `woordenschat_tabel`
@@ -92,17 +73,8 @@ CREATE TABLE `woordenschat_tabel` (
   `foutwaarde_naar_uitspraak` int DEFAULT NULL,
   `notitie` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`idwoordenschat_tabel`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `woordenschat_tabel`
---
-
-LOCK TABLES `woordenschat_tabel` WRITE;
-/*!40000 ALTER TABLE `woordenschat_tabel` DISABLE KEYS */;
-/*!40000 ALTER TABLE `woordenschat_tabel` ENABLE KEYS */;
-UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -113,4 +85,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-12-09 20:47:23
+-- Dump completed on 2023-12-10 17:37:17
