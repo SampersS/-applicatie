@@ -42,6 +42,15 @@ app.post("/backend/addGroup/:name",(req,res)=>{
 app.delete("/backend/deleteGroup/:id",(req,res)=>{
   databasehelper.DeleteGroup(req,res,req.params.id)
 })
+app.delete("/backend/deleteWoord/:id",(req,res)=>{
+  databasehelper.RemoveWord(req,res,req.params.id)
+})
+app.delete("/backend/deleteKanji/:id",(req,res)=>{
+  databasehelper.RemoveKanji(req,res,req.params.id)
+})
+app.delete("/backend/getEntries/:table",(req,res)=>{
+  databasehelper.RemoveKanji(req,res,req.params.table)
+})
 app.listen(port, () => {
   console.log(`Backend app listening on port ${port}`)
 })

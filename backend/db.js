@@ -87,7 +87,6 @@ const PostWoord = (req, res,groepid,uitspraak,kanji,betekenis,notitie) => {
         connection.end()
     })
 }
-
 const PostKanji = (req, res,groep_id,uitspraakvb, betekenis,chara,img,notitie) => {
     configConnect(function(connection){
         const queryry = "insert into charakter_tabel values(null, "+groep_id+",\""+uitspraakvb+"\", \""+betekenis+"\", \""+chara+"\",\""+img+"\",DATE_SUB(now(), INTERVAL 24 HOUR),255,DATE_SUB(now(),INTERVAL 24 HOUR),255,\""+notitie+"\")"
@@ -104,17 +103,51 @@ const PostKanji = (req, res,groep_id,uitspraakvb, betekenis,chara,img,notitie) =
         connection.end()
     })
 }
-
-const GetGroups = (req, res) => {
+const RemoveWord = (req, res, id) => {
+    const RemoveWord = (req, res, id) => {
+        configConnect(function(connection){
+            const queryry = "insert into charakter_tabel values(null, "+groep_id+",\""+uitspraakvb+"\", \""+betekenis+"\", \""+chara+"\",\""+img+"\",DATE_SUB(now(), INTERVAL 24 HOUR),255,DATE_SUB(now(),INTERVAL 24 HOUR),255,\""+notitie+"\")"
+            console.log(queryry)
+            connection.query(queryry, (err, data) => {
+                if(err){
+                    res.status(404).send({error:'sou da warui no jibun janai'})
+                    console.log("er was een error")
+                }else{
+                    //console.log('the query answer is: ', data);
+                    res.status(200).send("ok");
+                }
+            });
+            connection.end()
+        })
+    }
+}
+const RemoveKanji = (req, res, id) => {
     configConnect(function(connection){
-        const queryry = "select * from groep_namen"
+        const queryry = "delete from charakter_tabel where idcharakter_tabel="+id+ " limit 1"
+        console.log(queryry)
         connection.query(queryry, (err, data) => {
             if(err){
                 res.status(404).send({error:'sou da warui no jibun janai'})
                 console.log("er was een error")
             }else{
                 //console.log('the query answer is: ', data);
-                res.status(200).send(data);
+                res.status(200).send("ok");
+            }
+        });
+        connection.end()
+    })
+}
+const GetGroups = (req, res) => {
+    configConnect(function(connection){
+        const queryry = "delete from `woordenschat_tabel` where idwoordenschat_tabel="+id+ " limit 1"
+        console.log(queryry)
+        connection.query(queryry, (err, data) => {
+            if(err){
+                res.status(404).send({error:'sou da warui no jibun janai'})
+                console.log("er was een error")
+            }else{
+                //console.log('the query answer is: ', data);
+                res.status(200).send("ok");
             }
         });
         connection.end()
@@ -150,5 +183,19 @@ const DeleteGroup = (req, res,id) => {
         connection.end()
     })
 }
-
-module.exports = {ServerGenerate50Questions, QuestionReturn,PostWoord, PostKanji, GetGroups, AddGroup, DeleteGroup}
+const GetAllEntries = (req, res,tableName) => {
+    configConnect(function(connection){
+        const queryry = "select * from " + tableName
+        connection.query(queryry, (err, data) => {
+            if(err){
+                res.status(404).send({error:'sou da warui no jibun janai'})
+                console.log("er was een error")
+            }else{
+                //console.log('the query answer is: ', data);
+                res.status(200).send("ok");
+            }
+        });
+        connection.end()
+    })
+}
+module.exports = {ServerGenerate50Questions, QuestionReturn,PostWoord, PostKanji, GetGroups, AddGroup, DeleteGroup, RemoveKanji, RemoveWord, GetAllEntries}
