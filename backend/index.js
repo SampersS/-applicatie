@@ -48,8 +48,8 @@ app.delete("/backend/deleteWoord/:id",(req,res)=>{
 app.delete("/backend/deleteKanji/:id",(req,res)=>{
   databasehelper.RemoveKanji(req,res,req.params.id)
 })
-app.delete("/backend/getEntries/:table",(req,res)=>{
-  databasehelper.RemoveKanji(req,res,req.params.table)
+app.get("/backend/getEntries/:table",(req,res)=>{
+  databasehelper.GetAllEntries(req,res,req.params.table)
 })
 app.listen(port, () => {
   console.log(`Backend app listening on port ${port}`)

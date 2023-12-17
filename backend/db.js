@@ -16,7 +16,7 @@ let configConnect = (returnCode) => {
     });
     connection.connect(error => {
         if(error){
-            console.log("error: Unable to connect to database.")
+            console.log("error: Unable to connect to database.",error.message)
         }else{
             console.log("Verbonden met succes.")
             returnCode(connection)
@@ -104,22 +104,20 @@ const PostKanji = (req, res,groep_id,uitspraakvb, betekenis,chara,img,notitie) =
     })
 }
 const RemoveWord = (req, res, id) => {
-    const RemoveWord = (req, res, id) => {
-        configConnect(function(connection){
-            const queryry = "insert into charakter_tabel values(null, "+groep_id+",\""+uitspraakvb+"\", \""+betekenis+"\", \""+chara+"\",\""+img+"\",DATE_SUB(now(), INTERVAL 24 HOUR),255,DATE_SUB(now(),INTERVAL 24 HOUR),255,\""+notitie+"\")"
-            console.log(queryry)
-            connection.query(queryry, (err, data) => {
-                if(err){
-                    res.status(404).send({error:'sou da warui no jibun janai'})
-                    console.log("er was een error")
-                }else{
-                    //console.log('the query answer is: ', data);
-                    res.status(200).send("ok");
-                }
-            });
-            connection.end()
-        })
-    }
+    configConnect(function(connection){
+        const queryry = "delete from `woordenschat_tabel` where idwoordenschat_tabel="+id+ " limit 1"
+        console.log(queryry)
+        connection.query(queryry, (err, data) => {
+            if(err){
+                res.status(404).send({error:'sou da warui no jibun janai'})
+                console.log("er was een error")
+            }else{
+                //console.log('the query answer is: ', data);
+                res.status(200).send("ok");
+            }
+        });
+        connection.end()
+    })
 }
 const RemoveKanji = (req, res, id) => {
     configConnect(function(connection){
@@ -139,7 +137,7 @@ const RemoveKanji = (req, res, id) => {
 }
 const GetGroups = (req, res) => {
     configConnect(function(connection){
-        const queryry = "delete from `woordenschat_tabel` where idwoordenschat_tabel="+id+ " limit 1"
+        const queryry = "select * from groep_namen"
         console.log(queryry)
         connection.query(queryry, (err, data) => {
             if(err){
@@ -147,7 +145,7 @@ const GetGroups = (req, res) => {
                 console.log("er was een error")
             }else{
                 //console.log('the query answer is: ', data);
-                res.status(200).send("ok");
+                res.status(200).send(data);
             }
         });
         connection.end()
@@ -192,7 +190,7 @@ const GetAllEntries = (req, res,tableName) => {
                 console.log("er was een error")
             }else{
                 //console.log('the query answer is: ', data);
-                res.status(200).send("ok");
+                res.status(200).send(data);
             }
         });
         connection.end()
