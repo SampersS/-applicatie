@@ -2,8 +2,11 @@ const express = require("express")
 const app = express()
 const port = 3000
 const databasehelper = require("./db")
+const util = require("util")
+const fileHelper = require("./fileHelper.js")
 var Opvragingen
 var arrayindex = 0;
+global.__dirname = process.cwd();
 
 app.get('/backend/', (req, res) => {
   res.send('Verbinding met de backend is werkend!')
@@ -50,6 +53,24 @@ app.delete("/backend/deleteKanji/:id",(req,res)=>{
 })
 app.get("/backend/getEntries/:table",(req,res)=>{
   databasehelper.GetAllEntries(req,res,req.params.table)
+})
+app.post("/dackendIMG", async (req, res) => {
+  try{
+    await util.promisify(fileHelper.upload.single("file"))(req , res);
+    if(req.file == undefined){
+      return res.status(400).send({ message: "Please upload a file!"});
+    }
+    res.json({ message: "File uploaded successfully" });
+  }catch(error){
+    console.error(error)
+    res.status(400).send("error met je bestand.")
+  }
+});
+app.get("/dackendIMG/:id", (req, res) => {
+  fileHelper.sendFile(req, res)
+})
+app.delete("/dackendIMG/:id", (req, res) => {
+  fileHelper.deleteFile(req,res)
 })
 app.listen(port, () => {
   console.log(`Backend app listening on port ${port}`)

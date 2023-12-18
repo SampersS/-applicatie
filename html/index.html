@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Main</title>
+</head>
+<body>
+    <div id="inlogForm">
+        <label for="txtPassword">Wachtwoord:</label><br>
+        <input type="password" id="txtPassword"><br>
+        <button type="button" onclick="validation()">valideer Wachtwoord</button>
+    </div>
+    <div id="menu" style="display: none;">
+        <button  type="button" onclick="startstudie()">start studeren!</button>
+        <div id="modeselecting" style="display: none;">
+            <p>Selecteer je mode</p>
+            <select name="Kanjimode" id="Kanjimode" onchange="nextModeEnable()">
+                <option value=""></option>
+                <option value="kanji">Kanji</option>
+                <option value="woord">Woordenschat</option>
+            </select><br>
+            <select name="richtingmode" id="richtingmode" disabled>
+            </select>
+        </div>
+        <p>Andere opties</p>
+        <ul>
+            <li><a href="">Kanji/Woord Toevoegen</a></li>
+        </ul>
+    </div>
+</body>
+<script>
+    const validation = function(){
+        document.getElementById("menu").style.display = "inline";
+        document.getElementById("inlogForm").style.display = "none";
+    }
+    const nextModeEnable = function(){
+        let richtingelement = document.getElementById("richtingmode");
+        while (richtingelement.options.length > 0) {                
+            richtingelement.remove(0);
+        }
+        if(document.getElementById("Kanjimode").value != ""){
+            richtingelement.disabled= false;
+            option = new Option("TheText", "TheValue");
+            richtingelement.add( option );
+        }else{
+            richtingelement.disabled= true;
+        }
+        //document.getElementById("richtingmode").options;
+
+    }
+    const startstudie = function(){
+        document.getElementById("modeselecting").style.display = "inline";
+    }
+</script>
+</html>
