@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pagina 2</title>
+</head>
+<body onload="prepare()">
+    <h1>Opvraging:</h1>
+    <p id="veld1" style="margin: 0px;"></p>
+    <p id="veld2" style="margin: 0px;"></p>
+    <img src="" alt="af bitch" id="handzu-img">
+    <Button type="button" onclick="displayNextQuestion()">Volgende Vraag</Button>
+</body>
+<script>
+    var tabel = ""
+    var groepid = ""
+    var colom = ""
+    var queueReady = 0
+    const serverAddress = "http://192.168.0.2"
+    const apiAdditions = ":3000/backend/"
+    const prepare = function() {
+        let urldata = window.location.search.split("?")
+        console.log(urldata)
+        tabel = urldata[1];
+        colom = urldata[2];
+        groepid = urldata[3];
+    }
+    const displayNextQuestion = function() {
+        if(queueReady == 0){
+            GetData(serverAddress+apiAdditions+"generate50/"+groepid+"/"+tabel+"/"+colom,function(ret){
+                console.log(ret)
+                GetData(serverAddress+apiAdditions+"getQuestion", function(ques){
+                })
+            })
+        }else{
+            GetData(serverAddress+apiAdditions+"getQuestion", function(ques){
+            })  
+        }
+    }
+    const GetData = function(url, callback){
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                callback(JSON.parse(xhttp.responseText))
+            }
+        };
+        xhttp.open("GET", url, true);
+        xhttp.send();
+    }
+</script>
+</html>

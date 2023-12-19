@@ -11,24 +11,29 @@
         <button type="button" onclick="validation()">valideer Wachtwoord</button>
     </div>
     <div id="menu" style="display: none;">
-        <button  type="button" onclick="startstudie()">start studeren!</button>
-        <div id="modeselecting" style="display: none;">
-            <p>Selecteer je mode</p>
+        <div id="modeselecting">
+            <p style="margin: 0px;">Selecteer je mode</p>
             <select name="Kanjimode" id="Kanjimode" onchange="nextModeEnable()">
                 <option value=""></option>
-                <option value="kanji">Kanji</option>
-                <option value="woord">Woordenschat</option>
+                <option value="charakter_tabel">Kanji</option>
+                <option value="woordenschat_tabel">Woordenschat</option>
             </select><br>
-            <select name="richtingmode" id="richtingmode" disabled>
-            </select>
+            <p style="margin: 0px;">welke kolom opvragen?</p>
+            <select name="richtingmode" id="richtingmode" disabled></select><br>
+            <p style="margin: 0px;">welke groep?</p>
+            <select name="groepen" id="groepen" disabled></select><br>
+            <button type="button" onclick="DirectStudy()" id="studiebtn" disabled>start Studie</button>
         </div>
-        <p>Andere opties</p>
+        <p>Andere opties:</p>
         <ul>
             <li><a href="">Kanji/Woord Toevoegen</a></li>
         </ul>
     </div>
+    <a href="server.html">Server info</a>
 </body>
 <script>
+    const serverAddress = "http://192.168.0.2"
+    const apiAdditions = ":3000/backend/"
     const validation = function(){
         document.getElementById("menu").style.display = "inline";
         document.getElementById("inlogForm").style.display = "none";
@@ -38,18 +43,51 @@
         while (richtingelement.options.length > 0) {                
             richtingelement.remove(0);
         }
-        if(document.getElementById("Kanjimode").value != ""){
-            richtingelement.disabled= false;
-            option = new Option("TheText", "TheValue");
-            richtingelement.add( option );
-        }else{
-            richtingelement.disabled= true;
+        richtingelement.disabled= true;
+        let groepElement = document.getElementById("groepen");
+        while (groepElement.options.length > 0) {
+            groepElement.remove(0);
         }
-        //document.getElementById("richtingmode").options;
+        document.getElementById("studiebtn").disabled = true;
+        groepElement.disabled = true;
+        let selecvalu = document.getElementById("Kanjimode").value;
+        if(selecvalu != ""){
+            richtingelement.disabled= false;
+            groepElement.disabled = false;
+            document.getElementById("studiebtn").disabled = false;
+            option = new Option("betekenis", "betekenis");
+            richtingelement.add( option );
+            if(selecvalu == "kanji"){
+                option = new Option("teken", "teken");
+                richtingelement.add( option );
 
+            }else{
+                option = new Option("uitspraak", "uitspraak");
+                richtingelement.add( option );
+            }
+            let string = serverAddress+apiAdditions+"getGroups"
+            GetData(string, function(data){
+                for (let index = 0; index < data.length; index++) {
+                    option = new Option(data[index].naam, data[index].idgroep_namen);
+                    groepElement.add( option );
+                    console.log(data[index])
+                }
+            })
+        }
     }
-    const startstudie = function(){
-        document.getElementById("modeselecting").style.display = "inline";
+    const DirectStudy = function(){
+        let url = "study.html?"+document.getElementById("Kanjimode").value+"?"+document.getElementById("richtingmode").value+"?"+document.getElementById("groepen").value
+        window.location.href = url;
+    }
+    const GetData = function(url, callback){
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                callback(JSON.parse(xhttp.responseText))
+            }
+        };
+        xhttp.open("GET", url, true);
+        xhttp.send();
     }
 </script>
 </html>

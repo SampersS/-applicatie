@@ -1,12 +1,16 @@
 const express = require("express")
-const app = express()
 const port = 3000
 const databasehelper = require("./db")
 const util = require("util")
 const fileHelper = require("./fileHelper.js")
+const cors = require("cors")
 var Opvragingen
 var arrayindex = 0;
 global.__dirname = process.cwd();
+
+const app = express()
+app.use(cors());
+app.use(express.urlencoded({ extended: true}));
 
 app.get('/backend/', (req, res) => {
   res.send('Verbinding met de backend is werkend!')

@@ -41,7 +41,7 @@ const ServerGenerate50Questions = (req, res,group,kanjidb,mode,callback) => {
             console.log("er was een error")
         }else{
             //console.log('the query answer is: ', data);
-            res.status(200).send("lengte:"+data.length);
+            res.status(200).send("{\"lengte\":"+data.length+"}");
         }
         connection.end()
         return callback(data)
