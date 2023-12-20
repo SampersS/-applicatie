@@ -8,7 +8,7 @@
     <h1>Opvraging:</h1>
     <p id="veld1" style="margin: 0px;"></p>
     <p id="veld2" style="margin: 0px;"></p>
-    <img src="" alt="af bitch" id="handzu-img">
+    <img src="" alt="af bitch" id="handzuimg">
     <Button type="button" onclick="displayNextQuestion()">Volgende Vraag</Button>
 </body>
 <script>
@@ -18,24 +18,55 @@
     var queueReady = 0
     const serverAddress = "http://192.168.0.2"
     const apiAdditions = ":3000/backend/"
+    const apiIMGAdditions = ":3000/backendIMG/"
+    var DisplayLinks = {}
     const prepare = function() {
         let urldata = window.location.search.split("?")
         console.log(urldata)
         tabel = urldata[1];
         colom = urldata[2];
         groepid = urldata[3];
+        if(tabel == "charakter_tabel"){
+            if(colom == "teken"){
+                DisplayLinks.veld1 = "uitspraak voorbeeld"
+                DisplayLinks.veld2 = "betekenis"
+            }else{
+                DisplayLinks.veld1 = "uitspraak voorbeeld"
+                DisplayLinks.handzuimg = "img"
+            }
+        }else{
+            if(colom == "betekenis"){
+                DisplayLinks.veld1 = "romaji_uitspraak"
+            }else{
+                DisplayLinks.veld1 = "kanji"
+                DisplayLinks.veld2 = "betekenis"
+            }
+        }
     }
     const displayNextQuestion = function() {
         if(queueReady == 0){
             GetData(serverAddress+apiAdditions+"generate50/"+groepid+"/"+tabel+"/"+colom,function(ret){
                 console.log(ret)
-                GetData(serverAddress+apiAdditions+"getQuestion", function(ques){
-                })
+                queueReady = ret.lengte
+                if(queueReady==0){
+                    return
+                }
+                GetData(serverAddress+apiAdditions+"getQuestion", DisplayData)
             })
         }else{
-            GetData(serverAddress+apiAdditions+"getQuestion", function(ques){
-            })  
+            GetData(serverAddress+apiAdditions+"getQuestion", DisplayData)  
         }
+    }
+    const DisplayData = function(data){
+        console.log(data)
+        document.getElementById("veld1").textContent = data[DisplayLinks.veld1];
+        if(DisplayLinks.veld2 != undefined){
+            document.getElementById("veld2").textContent = data[DisplayLinks.veld2];
+        }
+        if(DisplayLinks.handzuimg != undefined){
+            document.getElementById("handzuimg").src = serverAddress + apiIMGAdditions + data[DisplayLinks.handzuimg];
+        }
+        queueReady --
     }
     const GetData = function(url, callback){
         var xhttp = new XMLHttpRequest();

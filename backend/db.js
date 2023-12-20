@@ -24,15 +24,8 @@ let configConnect = (returnCode) => {
     });
 }
 
-const ServerGenerate50Questions = (req, res,group,kanjidb,mode,callback) => {
-    let tabel = ""
-    if(kanjidb == "true"){
-        tabel = "charakter_tabel"
-    }else{
-        tabel = "woordenschat_tabel"
-    }
-    
-    configConnect(function(connection){
+const ServerGenerate50Questions = (req, res,group,tabel,mode,callback) => {
+  configConnect(function(connection){
         const queryry = "SELECT *, (TIMESTAMPDIFF(HOUR, l_opvraag_naar_"+mode+",NOW())*(4+foutwaarde_naar_"+mode+")) as berekening FROM "+tabel+" where groep_id="+group+" order by berekening desc limit 50;"
         console.log(queryry)
         connection.query(queryry, (err, data) => {

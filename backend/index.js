@@ -58,7 +58,7 @@ app.delete("/backend/deleteKanji/:id",(req,res)=>{
 app.get("/backend/getEntries/:table",(req,res)=>{
   databasehelper.GetAllEntries(req,res,req.params.table)
 })
-app.post("/dackendIMG", async (req, res) => {
+app.post("/backendIMG", async (req, res) => {
   try{
     await util.promisify(fileHelper.upload.single("file"))(req , res);
     if(req.file == undefined){
@@ -70,10 +70,10 @@ app.post("/dackendIMG", async (req, res) => {
     res.status(400).send("error met je bestand.")
   }
 });
-app.get("/dackendIMG/:id", (req, res) => {
+app.get("/backendIMG/:id", (req, res) => {
   fileHelper.sendFile(req, res)
 })
-app.delete("/dackendIMG/:id", (req, res) => {
+app.delete("/backendIMG/:id", (req, res) => {
   fileHelper.deleteFile(req,res)
 })
 app.listen(port, () => {
