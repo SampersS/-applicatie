@@ -8,8 +8,12 @@
     <h1>Opvraging:</h1>
     <p id="veld1" style="margin: 0px;"></p>
     <p id="veld2" style="margin: 0px;"></p>
-    <img src="" alt="af bitch" id="handzuimg">
-    <Button type="button" onclick="displayNextQuestion()">Volgende Vraag</Button>
+    <img src="" alt="" id="handzuimg" style="display: none;">
+    <p id="Oploss" style="margin: 0px;"></p>
+    <button type="button" onclick="ToonOploss()" id="btnOploss" disabled>Toon oplossing</button>
+    <Button type="button" onclick="displayNextQuestion()" id="btnNext">Volgende Vraag</Button>
+    <Button type="button" onclick="rate('goed')" class="btnRate" disabled>Goed</Button>
+    <Button type="button" onclick="rate('fout')" class="btnRate" disabled>Fout</Button>
 </body>
 <script>
     var tabel = ""
@@ -20,6 +24,8 @@
     const apiAdditions = ":3000/backend/"
     const apiIMGAdditions = ":3000/backendIMG/"
     var DisplayLinks = {}
+    var OplossingLinks = {}
+    var currentData = {}
     const prepare = function() {
         let urldata = window.location.search.split("?")
         console.log(urldata)
@@ -30,16 +36,21 @@
             if(colom == "teken"){
                 DisplayLinks.veld1 = "uitspraak voorbeeld"
                 DisplayLinks.veld2 = "betekenis"
+                OplossingLinks.handzuimg = "img"
             }else{
                 DisplayLinks.veld1 = "uitspraak voorbeeld"
                 DisplayLinks.handzuimg = "img"
+                OplossingLinks.Oploss = "betekenis"
             }
+            document.getElementById("handzuimg").style.display = "block"
         }else{
             if(colom == "betekenis"){
                 DisplayLinks.veld1 = "romaji_uitspraak"
+                OplossingLinks.Oploss = "betekenis"
             }else{
                 DisplayLinks.veld1 = "kanji"
                 DisplayLinks.veld2 = "betekenis"
+                OplossingLinks.Oploss = "romaji_uitspraak"
             }
         }
     }
@@ -65,8 +76,47 @@
         }
         if(DisplayLinks.handzuimg != undefined){
             document.getElementById("handzuimg").src = serverAddress + apiIMGAdditions + data[DisplayLinks.handzuimg];
+        }else{
+            document.getElementById("handzuimg").src = ""
         }
-        queueReady --
+        document.getElementById("Oploss").textContent = ""
+        queueReady--
+        document.getElementById("btnNext").disabled = true;
+        document.getElementById("btnOploss").disabled = false
+        let rij = document.getElementsByClassName("btnRate")
+        for(let i = 0; i < rij.length; i++){
+            rij[i].disabled = true
+        }
+        currentData = data
+    }
+    const ToonOploss = function(){
+        if(OplossingLinks.handzuimg != undefined){
+            document.getElementById("handzuimg").src = serverAddress + apiIMGAdditions + currentData[OplossingLinks.handzuimg];
+        }
+        if(OplossingLinks.Oploss != undefined){
+            document.getElementById("Oploss").textContent = currentData[OplossingLinks.Oploss];
+        }
+        let rij = document.getElementsByClassName("btnRate")
+        for(let i = 0; i < rij.length; i++){
+            rij[i].disabled = false
+        }
+        document.getElementById("btnOploss").disabled = true
+        document.getElementById("btnNext").disabled = false
+    }
+    const rate = function(reslt){
+        let foutwaarde = currentData["foutwaarde_naar_"+colom]
+        foutwaarde = foutwaarde >> 2;
+        if(reslt == "fout"){
+            foutwaarde += 128
+        }
+        var http = new XMLHttpRequest();
+        var url = serverAddress+apiAdditions+"returnResult/"+currentData["id"+tabel]+"/"+tabel+"/"+colom+"/"+foutwaarde;
+        http.open('PUT', url, true);
+        http.send();
+        let rij = document.getElementsByClassName("btnRate")
+        for(let i = 0; i < rij.length; i++){
+            rij[i].disabled = true
+        }
     }
     const GetData = function(url, callback){
         var xhttp = new XMLHttpRequest();

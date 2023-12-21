@@ -41,13 +41,7 @@ const ServerGenerate50Questions = (req, res,group,tabel,mode,callback) => {
     });})
 }
 
-const QuestionReturn = (req, res,id,kanjidb,mode,fwaarde) => {
-    let tabel = ""
-    if(kanjidb == "true"){
-        tabel = "charakter_tabel"
-    }else{
-        tabel = "woordenschat_tabel"
-    }
+const QuestionReturn = (req, res,id,tabel,mode,fwaarde) => {
     configConnect(function(connection){
         const queryry = "update "+tabel+" Set l_opvraag_naar_"+mode+" =now(), foutwaarde_naar_"+mode+" = "+ fwaarde +" where id"+tabel + " = "+id;
         console.log(queryry)

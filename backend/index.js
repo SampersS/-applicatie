@@ -31,8 +31,8 @@ app.get("/backend/getQuestion", (req, res) => {
   res.send(Opvragingen[arrayindex])
   arrayindex++
 })
-app.put("/backend/returnResult/:id/:kanjidb/:mode/:fwaarde", (req, res) => {
-  databasehelper.QuestionReturn(req, res, req.params.id,req.params.kanjidb,req.params.mode,req.params.fwaarde)
+app.put("/backend/returnResult/:id/:db/:mode/:fwaarde", (req, res) => {
+  databasehelper.QuestionReturn(req, res, req.params.id,req.params.db,req.params.mode,req.params.fwaarde)
 })
 app.post("/backend/postWoord/:groepid/:uitspraak/:kanji/:betekenis/:notitie", (req, res) => {
   databasehelper.PostWoord(req, res, req.params.groepid,req.params.uitspraak,req.params.kanji,req.params.betekenis,req.params.notitie)
