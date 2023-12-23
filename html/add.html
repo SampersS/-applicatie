@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>add html</title>
+</head>
+<body onload="prepare()">
+<h1>Voeg een entry toe</h1>
+<p style="margin: 0px;">Selecteer je mode</p>
+    <select name="Kanjimode" id="Kanjimode" onchange="nextModeEnable()">
+        <option value=""></option>
+        <option value="charakter_tabel">Kanji</option>
+        <option value="woordenschat_tabel">Woordenschat</option>   
+    </select>
+    <p style="margin: 0px;">welke groep?</p>
+    <select name="groepen" id="groepen"></select><br>
+    <div id="totalEnable">
+        <label for="txtUitspraak">Uitspraak:</label><br>
+        <input id="txtUitspraak"><br>
+        <label for="txtBetekenis">Betekenis:</label><br>
+        <input id="txtBetekenis"><br>
+    </div>
+    <div id="kanjimode">
+        <label for="txtChar">Charakter:</label><br>
+        <input id="txtChar"><br>
+        <label for="file_input">Afbeelding van kanji:</label><br>
+        <input id="file_input" onchange="getFile()" accept="image/*" type="file"><br>
+    </div>
+</body>
+<script>
+const serverAddress = "http://192.168.0.2"
+const apiAdditions = ":3000/backend/"
+const apiIMGAdditions = ":3000/backendIMG/"
+var Image = null
+const nextModeEnable = function(){
+    let selecvalu = document.getElementById("Kanjimode").value;
+}
+const prepare = function(){
+    let string = serverAddress+apiAdditions+"getGroups"
+    let groepElement = document.getElementById("groepen");
+    GetData(string, function(data){
+        for (let index = 0; index < data.length; index++) {
+            option = new Option(data[index].naam, data[index].idgroep_namen);
+            groepElement.add( option );
+            console.log(data[index])
+        }
+    })
+}
+const getFile = function(){
+    let fileelement = document.getElementById("file_input")
+    if(fileelement.files.length!=0 && fileelement.files[0].type.indexOf("image") != -1){
+        console.log(fileelement.files[0].size)
+        Image = fileelement.files[0]
+    }
+}
+const sendData = function(){
+    let formData = new FormData();
+    formData.append('file', Image, Image.name);
+    /*await axios.post("http://${VUE_APP_API_HOST}:3000/upload",formData,{
+    headers: {
+        'Content-Type': 'multipart/form-data'
+    }})*/
+}
+const GetData = function(url, callback){
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            callback(JSON.parse(xhttp.responseText))
+        }
+    };
+    xhttp.open("GET", url, true);
+    xhttp.send();
+}
+</script>
+</html>
