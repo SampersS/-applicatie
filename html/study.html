@@ -8,7 +8,7 @@
     <h1>Opvraging:</h1>
     <p id="veld1" style="margin: 0px;"></p>
     <p id="veld2" style="margin: 0px;"></p>
-    <img src="" alt="" id="handzuimg" style="display: none;">
+    <img src="" alt="" id="handzuimg" style="display: none;" >
     <p id="Oploss" style="margin: 0px;"></p>
     <button type="button" onclick="ToonOploss()" id="btnOploss" disabled>Toon oplossing</button>
     <Button type="button" onclick="displayNextQuestion()" id="btnNext">Volgende Vraag</Button>
@@ -75,7 +75,8 @@
             document.getElementById("veld2").textContent = data[DisplayLinks.veld2];
         }
         if(DisplayLinks.handzuimg != undefined){
-            document.getElementById("handzuimg").src = serverAddress + apiIMGAdditions + data[DisplayLinks.handzuimg];
+            console.log(decodeURI(data[DisplayLinks.handzuimg]))
+            document.getElementById("handzuimg").src = serverAddress + apiIMGAdditions + decodeURI(data[DisplayLinks.handzuimg]);
         }else{
             document.getElementById("handzuimg").src = ""
         }

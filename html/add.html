@@ -14,18 +14,23 @@
     </select>
     <p style="margin: 0px;">welke groep?</p>
     <select name="groepen" id="groepen"></select><br>
-    <div id="totalEnable">
-        <label for="txtUitspraak">Uitspraak:</label><br>
-        <input id="txtUitspraak"><br>
-        <label for="txtBetekenis">Betekenis:</label><br>
-        <input id="txtBetekenis"><br>
-    </div>
-    <div id="kanjimode">
+    <label for="txtUitspraak">Uitspraak:</label><br>
+    <input id="txtUitspraak"><br>
+    <label for="txtBetekenis">Betekenis:</label><br>
+    <input id="txtBetekenis"><br>
+    <div id="kanjimode" style="display: none;">
         <label for="txtChar">Charakter:</label><br>
         <input id="txtChar"><br>
         <label for="file_input">Afbeelding van kanji:</label><br>
         <input id="file_input" onchange="getFile()" accept="image/*" type="file"><br>
     </div>
+    <div id="vocabmode" style="display: none;">
+        <label for="txtKanjiWrite">In kanji geschreven:</label><br>
+        <input id="txtKanjiWrite"><br>
+    </div>
+    <label for="txtNotitie">Notitie:</label><br>
+    <input id="txtNotitie"><br>
+    <button onclick="sendData()" id="btnSubmit" disabled>Verstuur</button>
 </body>
 <script>
 const serverAddress = "http://192.168.0.2"
@@ -34,6 +39,19 @@ const apiIMGAdditions = ":3000/backendIMG/"
 var Image = null
 const nextModeEnable = function(){
     let selecvalu = document.getElementById("Kanjimode").value;
+    let kanjiElement = document.getElementById("kanjimode")
+    let vocabElement = document.getElementById("vocabmode")
+    let subBut = document.getElementById("btnSubmit")
+    subBut.disabled = false
+    kanjiElement.style.display = "none"
+    vocabElement.style.display = "none"
+    if(selecvalu == "charakter_tabel"){
+        kanjiElement.style.display = "block"
+    }else if(selecvalu == "woordenschat_tabel"){
+        vocabElement.style.display = "block"
+    }else{
+        subBut.disabled = true
+    }
 }
 const prepare = function(){
     let string = serverAddress+apiAdditions+"getGroups"
@@ -54,12 +72,49 @@ const getFile = function(){
     }
 }
 const sendData = function(){
+    let selecvalu = document.getElementById("Kanjimode").value;
+    let groepElement = document.getElementById("groepen");
+    let uitspraakElement = document.getElementById("txtUitspraak")
+    let betekenisElement = document.getElementById("txtBetekenis")
+    let charElement = document.getElementById("txtChar")
+    let kanjigeschrevenElement = document.getElementById("txtKanjiWrite")
+    let notitieElement = document.getElementById("txtNotitie")
+    let urlparm = ""
+    if(selecvalu == "charakter_tabel"){
+        urlparm = "postKanji/"
+        urlparm += groepElement.value + "/"
+        urlparm += uitspraakElement.value +"/"
+        urlparm += betekenisElement.value +"/"
+        urlparm += charElement.value +"/"
+        urlparm += Image.name + "/"
+        urlparm += notitieElement.value
+        
+        let formData = new FormData();
+        formData.append('file', Image);
+        var http = new XMLHttpRequest();
+        var url = serverAddress+apiIMGAdditions;
+        http.open('POST', url, false);
+        http.send(formData);
+    }else{
+        urlparm = "postWoord/"
+        urlparm += groepElement.value+"/"
+        urlparm += uitspraakElement.value+"/"
+        urlparm += kanjigeschrevenElement.value+"/"
+        urlparm += betekenisElement.value+"/"
+        urlparm += notitieElement.value+"/"
+    }
+    var http = new XMLHttpRequest();
+    http.open('POST', serverAddress+apiAdditions+urlparm);
+    http.send();
+    window.location.href = "index.html"
+}
+const fileSendTest = function(){
     let formData = new FormData();
-    formData.append('file', Image, Image.name);
-    /*await axios.post("http://${VUE_APP_API_HOST}:3000/upload",formData,{
-    headers: {
-        'Content-Type': 'multipart/form-data'
-    }})*/
+    formData.append('file', Image);
+    var http = new XMLHttpRequest();
+    var url = serverAddress+apiIMGAdditions;
+    http.open('POST', url);
+    http.send(formData);
 }
 const GetData = function(url, callback){
     var xhttp = new XMLHttpRequest();
