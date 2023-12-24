@@ -7,8 +7,8 @@ Als je de app of website voor het eerst opent kan je woorden/kanji toe voegen, d
 <ul>
   <li>Server+Database (api), dit in node + express ofz</li>
   <li>Html frontend, draaiende op zelfde server als api, simpele html+js zodat ik op elk apparaat maar ook kan studeren. (toch een apple apparaten ban).</li>
-  <li>(Als ik niets te doen heb) Een android app die ook lokaal een database kan hebben of kan gebruik maken van een server.</li>
+  <li>(Als ik niets te doen heb) Een j2me toepassing die ook lokaal een database kan hebben of kan gebruik maken van een server.</li>
+  <li>Zelfde als hierboven maar dan voor android</li>
   <li>Zelfde als hierboven maar dan voor windows (wss met c of c++)</li>
   <li>Zelfde als hierboven maar dan voor windows phone</li>
-  <li>Zelfde als hierboven maar dan voor j2me</li>
 </ul>
