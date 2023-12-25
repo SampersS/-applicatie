@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+<body>
+    <select name="Kanjimode" id="Kanjimode" onchange="nextModeEnable()">
+        <option value=""></option>
+        <option value="charakter_tabel">Kanji</option>
+        <option value="woordenschat_tabel">Woordenschat</option>
+    </select>
+    <button onclick="window.location.href = 'index.html'">Terug</button><br>
+    <table id = "tabel">
+        <tr style="display: none;" id="kanjiHeader">
+            <th>id</th>
+            <th>groep id</th>
+            <th>Uitspraak</th>
+            <th>Betekenis</th>
+            <th>Charakter</th>
+            <th>img</th>
+            <th>Notitie</th>
+            <th>Verwijderen</th>
+        </tr>
+        <tr style="display: none;" id="vocabHeader">
+            <th>id</th>
+            <th>groep id</th>
+            <th>Uitspraak</th>
+            <th>Betekenis</th>
+            <th>Kanji Schrijfwijze</th>
+            <th>Notitie</th>
+            <th>Verwijderen</th>
+        </tr>
+    </table>
+</body>
+<script>
+    const serverAddress = "http://192.168.0.2"
+    const apiAdditions = ":3000/backend/"
+    const apiIMGAdditions = ":3000/backendIMG/"
+    const ExtraRows = 2
+    const nextModeEnable = function(){
+        let element = document.getElementById("Kanjimode")
+        let tabel = document.getElementById("tabel")
+
+        var rowCount = tabel.rows.length;
+        for (var i = ExtraRows; i < rowCount; i++) {
+            tabel.deleteRow(ExtraRows);
+        }
+
+        if(element.value == ""){
+            return
+        }
+        if(element.value == "woordenschat_tabel"){
+            document.getElementById("vocabHeader").style.display = ""
+            document.getElementById("kanjiHeader").style.display = "none"
+        }else{
+            document.getElementById("vocabHeader").style.display = "none"
+            document.getElementById("kanjiHeader").style.display = ""
+        }
+
+        GetData(serverAddress+apiAdditions+"getEntries/"+element.value, function(data){
+            for(let index = 0; index < data.length; index++){
+                let newrow = tabel.insertRow()
+                let cel1 = newrow.insertCell();
+                let cel2 = newrow.insertCell()
+                let cel3 = newrow.insertCell();
+                let cel4 = newrow.insertCell();
+                let cel5 = newrow.insertCell();
+                let cel6 = newrow.insertCell();
+                let cel7 = newrow.insertCell();
+                let cel8 = newrow.insertCell();
+                let id_nr
+                if(element.value == "charakter_tabel"){
+                    id_nr = data[index].idcharakter_tabel
+                    let id = document.createTextNode(data[index].idcharakter_tabel);
+                    cel1.appendChild(id)
+                    let gr = document.createTextNode(data[index].groep_id);
+                    cel2.appendChild(gr)
+                    let uv = document.createTextNode(data[index]["uitspraak voorbeeld"]);
+                    cel3.appendChild(uv)
+                    let bet = document.createTextNode(data[index].betekenis);
+                    cel4.appendChild(bet)
+                    let ch = document.createTextNode(data[index].ckarakter);
+                    cel5.appendChild(ch)
+                    let im = document.createTextNode(data[index].img);
+                    cel6.appendChild(im)
+                }else{
+                    id_nr = data[index].idwoordenschat_tabel
+                    id = document.createTextNode(data[index].idwoordenschat_tabel);
+                    cel1.appendChild(id)
+                    let gr = document.createTextNode(data[index].groep_id);
+                    cel2.appendChild(gr)
+                    let uv = document.createTextNode(data[index]["romaji_uitspraak"]);
+                    cel3.appendChild(uv)
+                    let kj = document.createTextNode(data[index].kanji);
+                    cel4.appendChild(kj)
+                    let bet = document.createTextNode(data[index].betekenis);
+                    cel5.appendChild(bet)
+                }
+                let nt = document.createTextNode(data[index].notitie);
+                cel7.appendChild(nt)
+                let bt = document.createElement("BUTTON");
+                bt.appendChild(document.createTextNode("verwijder"));
+                bt.addEventListener("click", function(){Delete(id_nr,index+ExtraRows)});
+                cel8.appendChild(bt)
+            }
+        })
+    }
+    const Delete = function(id, index){
+        var xhttp = new XMLHttpRequest();
+        let element = document.getElementById("Kanjimode")
+        let tabelElement = document.getElementById("tabel")
+        url = serverAddress+apiAdditions
+        if(element.value == "charakter_tabel"){
+            url += "deleteKanji/"
+            var xhttp2 = new XMLHttpRequest();
+            xhttp2.open("DELETE", serverAddress+apiIMGAdditions+tabelElement.rows[index].cells[5].textContent ,true);
+            xhttp2.send();
+        }else{
+            url += "deleteWoord/"
+        }
+        url += id
+        xhttp.open("DELETE", url, true);
+        xhttp.send();
+        tabelElement.deleteRow(index)
+    }
+    const GetData = function(url, callback){
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                callback(JSON.parse(xhttp.responseText))
+            }
+        };
+        xhttp.open("GET", url, true);
+        xhttp.send();
+    }
+</script>
+</html>

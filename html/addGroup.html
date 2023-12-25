@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+<body onload="prepare()">
+    <p style="margin: 0px;">Naam:</p><br>
+    <input type="text" id="txtnaam"><br>
+    <button onclick="sendNew()">Voeg toe</button>
+    <button onclick="window.location.href = 'index.html'">Terug</button><br>
+    <p style="margin: 0px;">Ingaven:</p>
+    <table id="tabel">
+        <tr>
+            <th>id</th>
+            <th>naam</th>
+        </tr>
+    </table>
+</body>
+<script>
+    const serverAddress = "http://192.168.0.2"
+    const apiAdditions = ":3000/backend/"
+    const sendNew = function(){
+        let naam = document.getElementById("txtnaam").value
+        if(naam != ""){
+            let url = serverAddress+apiAdditions+"addGroup/"+naam
+            var http = new XMLHttpRequest();
+            http.open('POST', url, false);
+            http.send();
+            console.log("verzonden...")
+        }
+    }
+    const prepare = function(){
+        let string = serverAddress+apiAdditions+"getGroups"
+        let groepElement = document.getElementById("groepen");
+        GetData(string, function(data){
+            for (let index = 0; index < data.length; index++) {
+                let tabelElement = document.getElementById("tabel")
+                let newrow = tabelElement.insertRow()
+                let cel1 = newrow.insertCell();
+                let cel2 = newrow.insertCell();
+                let id = document.createTextNode(data[index].idgroep_namen);
+                let naam = document.createTextNode(data[index].naam);
+                cel1.appendChild(id)
+                cel2.appendChild(naam)
+            }
+        })
+    }
+    const GetData = function(url, callback){
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            callback(JSON.parse(xhttp.responseText))
+        }
+    };
+    xhttp.open("GET", url, true);
+    xhttp.send();
+}
+</script>
+</html>
