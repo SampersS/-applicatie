@@ -38,14 +38,10 @@
     const apiAdditions = ":3000/backend/"
     const apiIMGAdditions = ":3000/backendIMG/"
     const ExtraRows = 2
+    var curData
     const nextModeEnable = function(){
         let element = document.getElementById("Kanjimode")
         let tabel = document.getElementById("tabel")
-
-        var rowCount = tabel.rows.length;
-        for (var i = ExtraRows; i < rowCount; i++) {
-            tabel.deleteRow(ExtraRows);
-        }
 
         if(element.value == ""){
             return
@@ -59,7 +55,19 @@
         }
 
         GetData(serverAddress+apiAdditions+"getEntries/"+element.value, function(data){
-            for(let index = 0; index < data.length; index++){
+            curData = data
+            RefreshList()
+        })
+    }
+    const RefreshList = function(){
+        let data = curData
+        let tabel = document.getElementById("tabel")
+        let element = document.getElementById("Kanjimode")
+        var rowCount = tabel.rows.length;
+        for (var i = ExtraRows; i < rowCount; i++) {
+            tabel.deleteRow(ExtraRows);
+        }
+        for(let index = 0; index < data.length; index++){
                 let newrow = tabel.insertRow()
                 let cel1 = newrow.insertCell();
                 let cel2 = newrow.insertCell()
@@ -104,9 +112,9 @@
                 bt.addEventListener("click", function(){Delete(id_nr,index+ExtraRows)});
                 cel8.appendChild(bt)
             }
-        })
     }
     const Delete = function(id, index){
+        console.log("te verwijderen:",index)
         var xhttp = new XMLHttpRequest();
         let element = document.getElementById("Kanjimode")
         let tabelElement = document.getElementById("tabel")
@@ -122,7 +130,8 @@
         url += id
         xhttp.open("DELETE", url, true);
         xhttp.send();
-        tabelElement.deleteRow(index)
+        curData.splice(index-ExtraRows,1)
+        RefreshList()
     }
     const GetData = function(url, callback){
         var xhttp = new XMLHttpRequest();
