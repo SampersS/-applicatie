@@ -80,6 +80,7 @@ const sendData = function(){
     let kanjigeschrevenElement = document.getElementById("txtKanjiWrite")
     let notitieElement = document.getElementById("txtNotitie")
     let urlparm = ""
+    if(notitieElement.value == "") {notitieElement.value = " "}
     if(selecvalu == "charakter_tabel"){
         urlparm = "postKanji/"
         urlparm += groepElement.value + "/"
@@ -87,7 +88,7 @@ const sendData = function(){
         urlparm += betekenisElement.value +"/"
         urlparm += charElement.value +"/"
         urlparm += Image.name + "/"
-        urlparm += notitieElement.value
+        urlparm += notitieElement.value+"/"
         
         let formData = new FormData();
         formData.append('file', Image);

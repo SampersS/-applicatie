@@ -183,4 +183,19 @@ const GetAllEntries = (req, res,tableName) => {
         connection.end()
     })
 }
-module.exports = {ServerGenerate50Questions, QuestionReturn,PostWoord, PostKanji, GetGroups, AddGroup, DeleteGroup, RemoveKanji, RemoveWord, GetAllEntries}
+const GetSameVocab = (req, res, uitspraak) => {
+    configConnect(function(connection){
+        const queryry = "select * from woordenschat_tabel where romaji_uitspraak=\""+uitspraak+"\""
+        connection.query(queryry, (err, data) => {
+            if(err){
+                res.status(404).send({error:'sou da warui no jibun janai'})
+                console.log(err.message)
+            }else{
+                //console.log('the query answer is: ', data);
+                res.status(200).send(data);
+            }
+        });
+        connection.end()
+    })
+}
+module.exports = {ServerGenerate50Questions, QuestionReturn,PostWoord, PostKanji, GetGroups, AddGroup, DeleteGroup, RemoveKanji, RemoveWord, GetAllEntries, GetSameVocab}

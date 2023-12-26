@@ -58,6 +58,9 @@ app.delete("/backend/deleteKanji/:id",(req,res)=>{
 app.get("/backend/getEntries/:table",(req,res)=>{
   databasehelper.GetAllEntries(req,res,req.params.table)
 })
+app.get("/backend/zelfdeUitspraak/:uitspraak",(req,res)=>{
+  databasehelper.GetSameVocab(req,res,req.params.uitspraak)
+})
 app.post("/backendIMG", async (req, res) => {
   try{
     await util.promisify(fileHelper.upload.single("file"))(req , res);

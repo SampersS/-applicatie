@@ -14,6 +14,11 @@
     <Button type="button" onclick="displayNextQuestion()" id="btnNext">Volgende Vraag</Button>
     <Button type="button" onclick="rate('goed')" class="btnRate" disabled>Goed</Button>
     <Button type="button" onclick="rate('fout')" class="btnRate" disabled>Fout</Button>
+    <table id="tabel" style="display: none;">
+        <tr>
+            <th>Andere betekenissen:</th>
+        </tr>
+    </table>
 </body>
 <script>
     var tabel = ""
@@ -70,6 +75,7 @@
     }
     const DisplayData = function(data){
         console.log(data)
+        document.getElementById("tabel").style.display = "none"
         document.getElementById("veld1").textContent = data[DisplayLinks.veld1];
         if(DisplayLinks.veld2 != undefined){
             document.getElementById("veld2").textContent = data[DisplayLinks.veld2];
@@ -103,6 +109,21 @@
         }
         document.getElementById("btnOploss").disabled = true
         document.getElementById("btnNext").disabled = false
+        if(tabel == "woordenschat_tabel" && colom == "betekenis"){
+            let tabelElement = document.getElementById("tabel")
+            tabelElement.style.display = "block"
+            var rowCount = tabelElement.rows.length;
+            for (var i = 1; i < rowCount; i++) {
+                tabelElement.deleteRow(1);
+            }
+            GetData(serverAddress+apiAdditions+"zelfdeUitspraak/"+currentData.romaji_uitspraak,function(data){
+                for(let index = 0; index < data.length; index++){
+                    let newrow = tabelElement.insertRow()
+                    let cel1 = newrow.insertCell();
+                    cel1.appendChild(document.createTextNode(data[index].betekenis))
+                }
+            })
+        }
     }
     const rate = function(reslt){
         let foutwaarde = currentData["foutwaarde_naar_"+colom]
