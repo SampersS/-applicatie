@@ -10,10 +10,11 @@
     <p id="veld2" style="margin: 0px;"></p>
     <img src="" alt="" id="handzuimg" style="display: none;" >
     <p id="Oploss" style="margin: 0px;"></p>
-    <button type="button" onclick="ToonOploss()" id="btnOploss" disabled>Toon oplossing</button>
-    <Button type="button" onclick="displayNextQuestion()" id="btnNext">Volgende Vraag</Button>
+    <button type="button" onclick="ToonOploss()" id="btnOploss" disabled>Toon oplossing</button><br>
     <Button type="button" onclick="rate('goed')" class="btnRate" disabled>Goed</Button>
-    <Button type="button" onclick="rate('fout')" class="btnRate" disabled>Fout</Button>
+    <Button type="button" onclick="rate('fout')" class="btnRate" disabled>Fout</Button><br>
+    <Button type="button" onclick="displayNextQuestion()" id="btnNext">Volgende Vraag</Button><br>
+
     <table id="tabel" style="display: none;">
         <tr>
             <th>Andere betekenissen:</th>
@@ -110,17 +111,19 @@
         document.getElementById("btnOploss").disabled = true
         document.getElementById("btnNext").disabled = false
         if(tabel == "woordenschat_tabel" && colom == "betekenis"){
-            let tabelElement = document.getElementById("tabel")
-            tabelElement.style.display = "block"
-            var rowCount = tabelElement.rows.length;
-            for (var i = 1; i < rowCount; i++) {
-                tabelElement.deleteRow(1);
-            }
             GetData(serverAddress+apiAdditions+"zelfdeUitspraak/"+currentData.romaji_uitspraak,function(data){
-                for(let index = 0; index < data.length; index++){
-                    let newrow = tabelElement.insertRow()
-                    let cel1 = newrow.insertCell();
-                    cel1.appendChild(document.createTextNode(data[index].betekenis))
+                if(data.length> 1){
+                    let tabelElement = document.getElementById("tabel")
+                    tabelElement.style.display = "block"
+                    var rowCount = tabelElement.rows.length;
+                    for (var i = 1; i < rowCount; i++) {
+                        tabelElement.deleteRow(1);
+                    }
+                    for(let index = 0; index < data.length; index++){
+                        let newrow = tabelElement.insertRow()
+                        let cel1 = newrow.insertCell();
+                        cel1.appendChild(document.createTextNode(data[index].betekenis))
+                    }
                 }
             })
         }
@@ -135,10 +138,6 @@
         var url = serverAddress+apiAdditions+"returnResult/"+currentData["id"+tabel]+"/"+tabel+"/"+colom+"/"+foutwaarde;
         http.open('PUT', url, true);
         http.send();
-        let rij = document.getElementsByClassName("btnRate")
-        for(let i = 0; i < rij.length; i++){
-            rij[i].disabled = true
-        }
     }
     const GetData = function(url, callback){
         var xhttp = new XMLHttpRequest();
