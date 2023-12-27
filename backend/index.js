@@ -13,7 +13,12 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true}));
 
 app.get('/backend/', (req, res) => {
-  res.send('Verbinding met de backend is werkend!')
+  res.set({
+    "CacheControl":"no-cache",
+    "Pragma":"no-cache",
+    "Expires":"-1"
+  }).send('Verbinding met de backend is werkend!')
+  console.log("gotten")
 })
 app.get("/backend/generate50/:groupid/:kanjidb/:mode", (req, res) => {
   Opvragingen = databasehelper.ServerGenerate50Questions(req, res, req.params["groupid"], req.params["kanjidb"], req.params["mode"], function(data){
@@ -24,11 +29,19 @@ app.get("/backend/generate50/:groupid/:kanjidb/:mode", (req, res) => {
 })
 app.get("/backend/getQuestion", (req, res) => {
   if(Opvragingen == [] || arrayindex == Opvragingen.length){
-    res.send("error: geen vragen gegenereerd")
+    res.set({
+      "CacheControl":"no-cache",
+      "Pragma":"no-cache",
+      "Expires":"-1"
+    }).send("error: geen vragen gegenereerd")
     console.log(Opvragingen)
     return;
   }
-  res.send(Opvragingen[arrayindex])
+  res.set({
+    "CacheControl":"no-cache",
+    "Pragma":"no-cache",
+    "Expires":"-1"
+  }).send(Opvragingen[arrayindex])
   arrayindex++
 })
 app.put("/backend/returnResult/:id/:db/:mode/:fwaarde", (req, res) => {

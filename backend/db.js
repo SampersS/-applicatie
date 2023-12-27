@@ -30,11 +30,19 @@ const ServerGenerate50Questions = (req, res,group,tabel,mode,callback) => {
         console.log(queryry)
         connection.query(queryry, (err, data) => {
         if(err){
-            res.status(404).send({error:'sou da warui no jibun janai'})
+            res.set({
+                "CacheControl":"no-cache",
+                "Pragma":"no-cache",
+                "Expires":"-1"
+              }).status(404).send({error:'sou da warui no jibun janai'})
             console.log("er was een error")
         }else{
             //console.log('the query answer is: ', data);
-            res.status(200).send("{\"lengte\":"+data.length+"}");
+            res.set({
+                "CacheControl":"no-cache",
+                "Pragma":"no-cache",
+                "Expires":"-1"
+              }).status(200).send("{\"lengte\":"+data.length+"}");
         }
         connection.end()
         return callback(data)
@@ -128,11 +136,19 @@ const GetGroups = (req, res) => {
         console.log(queryry)
         connection.query(queryry, (err, data) => {
             if(err){
-                res.status(404).send({error:'sou da warui no jibun janai'})
+                res.set({
+                    "CacheControl":"no-cache",
+                    "Pragma":"no-cache",
+                    "Expires":"-1"
+                  }).status(404).send({error:'sou da warui no jibun janai'})
                 console.log("er was een error")
             }else{
                 //console.log('the query answer is: ', data);
-                res.status(200).send(data);
+                res.set({
+                    "CacheControl":"no-cache",
+                    "Pragma":"no-cache",
+                    "Expires":"-1"
+                  }).status(200).send(data);
             }
         });
         connection.end()
@@ -173,11 +189,19 @@ const GetAllEntries = (req, res,tableName) => {
         const queryry = "select * from " + tableName
         connection.query(queryry, (err, data) => {
             if(err){
-                res.status(404).send({error:'sou da warui no jibun janai'})
+                res.set({
+                    "CacheControl":"no-cache",
+                    "Pragma":"no-cache",
+                    "Expires":"-1"
+                  }).status(404).send({error:'sou da warui no jibun janai'})
                 console.log("er was een error")
             }else{
                 //console.log('the query answer is: ', data);
-                res.status(200).send(data);
+                res.set({
+                    "CacheControl":"no-cache",
+                    "Pragma":"no-cache",
+                    "Expires":"-1"
+                  }).status(200).send(data);
             }
         });
         connection.end()
@@ -188,11 +212,19 @@ const GetSameVocab = (req, res, uitspraak) => {
         const queryry = "select * from woordenschat_tabel where romaji_uitspraak=\""+uitspraak+"\""
         connection.query(queryry, (err, data) => {
             if(err){
-                res.status(404).send({error:'sou da warui no jibun janai'})
+                res.set({
+                    "CacheControl":"no-cache",
+                    "Pragma":"no-cache",
+                    "Expires":"-1"
+                  }).status(404).send({error:'sou da warui no jibun janai'})
                 console.log(err.message)
             }else{
                 //console.log('the query answer is: ', data);
-                res.status(200).send(data);
+                res.set({
+                    "CacheControl":"no-cache",
+                    "Pragma":"no-cache",
+                    "Expires":"-1"
+                  }).status(200).send(data);
             }
         });
         connection.end()

@@ -31,9 +31,17 @@ const upload = multer({
 var sendFile = (req, res) =>{
     const filename = req.params.id;
     const directoryPath = __dirname + "/images/"
-    res.download(directoryPath + filename, filename, (err) => {
+    res.set({
+        "CacheControl":"no-cache",
+        "Pragma":"no-cache",
+        "Expires":"-1"
+      }).download(directoryPath + filename, filename, (err) => {
         if(err){
-            res.status(500).send({
+            res.set({
+                "CacheControl":"no-cache",
+                "Pragma":"no-cache",
+                "Expires":"-1"
+              }).status(500).send({
                 message: "Could not download the file. " + err
             })
         }
