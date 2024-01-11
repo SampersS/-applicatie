@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Document</title>
+    <script src="./lib/prng4.js"></script>
+    <script src="./lib/rng.js"></script>
+    <script src="./lib/jsbn.js"></script>
+    <script src="./lib/rsa.js"></script>
+    <script src="./lib/base64.js"></script>
 </head>
 <body onload="prepare()">
     <p style="margin: 0px;">Naam:</p><br>
@@ -18,16 +23,24 @@
     </table>
 </body>
 <script>
-    const serverAddress = "http://192.168.0.2"
+    const serverAddress = "http://127.0.0.1"
     const apiAdditions = ":3000/backend/"
     const sendNew = function(){
         let naam = document.getElementById("txtnaam").value
         if(naam != ""){
-            let url = serverAddress+apiAdditions+"addGroup/"+naam
-            var http = new XMLHttpRequest();
-            http.open('POST', url, false);
-            http.send();
-            console.log("verzonden...")
+            GetData(serverAddress+apiAdditions+"KeyRandom",function(data){
+                let chsum = 0;
+                for(let i = 0; i < naam.length; i++){
+                    chsum += naam.charCodeAt(i)
+                }
+                var rsa = new RSAKey();
+                rsa.setPublic(data["modulo"],"10001")
+                let url = serverAddress+apiAdditions+"addGroup/"+naam+"/"+hex2b64(rsa.encrypt(chsum.toString()+data["rand"].toString()+"shit"))
+                var http = new XMLHttpRequest();
+                http.open('POST', url, false);
+                http.send();
+                console.log("verzonden...")
+            })
         }
     }
     const prepare = function(){

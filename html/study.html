@@ -75,7 +75,11 @@
         }
     }
     const DisplayData = function(data){
-        console.log(data)
+        if(data=="Genereer opnieuw"){
+            queueReady = 0;
+            displayNextQuestion();
+            return;
+        }
         document.getElementById("tabel").style.display = "none"
         document.getElementById("veld1").textContent = data[DisplayLinks.veld1];
         if(DisplayLinks.veld2 != undefined){

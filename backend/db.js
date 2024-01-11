@@ -45,7 +45,7 @@ const ServerGenerate50Questions = (req, res,group,tabel,mode,callback) => {
               }).status(200).send("{\"lengte\":"+data.length+"}");
         }
         connection.end()
-        return callback(data)
+        callback(data)
     });})
 }
 
@@ -141,7 +141,7 @@ const GetGroups = (req, res) => {
                     "Pragma":"no-cache",
                     "Expires":"-1"
                   }).status(404).send({error:'sou da warui no jibun janai'})
-                console.log("er was een error")
+                console.log("er was een error", err)
             }else{
                 //console.log('the query answer is: ', data);
                 res.set({
