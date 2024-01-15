@@ -14,6 +14,7 @@ global.__dirname = process.cwd();
 const app = express()
 app.use(cors());
 app.use(express.urlencoded({ extended: true}));
+app.use(express.text())
 
 app.get('/backend/', (req, res) => {
   res.set({
@@ -64,13 +65,14 @@ app.post("/backend/postKanji/:groepid/:uitspraak/:betekenis/:kanji/:img/:notitie
 app.get("/backend/getGroups",(req,res)=>{
   databasehelper.GetGroups(req,res)
 })
-app.post("/backend/addGroup/:name/:pwEncrypt",(req,res)=>{ //#
+app.post("/backend/addGroup/:name",(req,res)=>{ //#
   //checksum hier is numerieke waarde van elke letter in de naam opgetelt
   let chsum = 0;
   for(let i = 0; i < req.params.name.length; i++){
     chsum += req.params.name.charCodeAt(i)
   }
-  if(auth.Validate(req,res,req.params.pwEncrypt,chsum)){
+  console.log(req.body)
+  if(auth.Validate(req,res,req.body,chsum)){
     databasehelper.AddGroup(req,res,req.params.name)
   }
 })
