@@ -6,8 +6,8 @@ client: krijgt public key en random waarden, als hij wilt verstuuren moet hij ee
 daarna desencrypteerd de server de data in de body met de private key, check of de checksum klopt => check of de random waarde hetzelfde is => valideer wachtwoord. als alles goed is dan wordt de bewerking uitgevoert anders niet en krijgt de zender een lelijke response
 
 wachtwoord moet worden opgeslagen in de browser met web storage.
-random waarde wordt steeds bij de response van een schrijfactie geupdated en de eerste word gelevert via pagina zelf, mischien moet de server een lijst bijhouden van toegestane willekeurige waarden om noob hackers die de api steeds opvragen te straffen, ofwel bijhouden per ip address.
+steeds er een geautenticeerde actie wordt uitgevoert moet de random waarde (bijgehouden per ip address) met 1 vermeerderen om aanvallen met dezelfde geincrypteerde data te vermijden.
 
-node functie: get key+random, elke keer je een authenticatie request maakt met de key en random is de random++ (bijgehouden in node en frontend) wordt opgeslagen per ip address en ververst op nieuwe aanvraag
+node functie: get key+random
 
 Voor browsers zonder web storage: altijd een wachtwoordveld ergens op de pagina

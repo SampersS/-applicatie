@@ -8,6 +8,7 @@
     <script src="./lib/jsbn.js"></script>
     <script src="./lib/rsa.js"></script>
     <script src="./lib/base64.js"></script>
+    <script src="./lib/tools.js"></script>
 </head>
 <body onload="prepare()">
     <p style="margin: 0px;">Naam:</p><br>
@@ -25,29 +26,23 @@
 <script>
     const serverAddress = "http://127.0.0.1"
     const apiAdditions = ":3000/backend/"
-    function decimalToHex(d, padding) {
-        var hex = Number(d).toString(16);
-        while (hex.length < padding) {
-            hex = "0" + hex;
-        }
-        return hex;
-    }
     const sendNew = function(){
         let naam = document.getElementById("txtnaam").value
         if(naam != ""){
             GetData(serverAddress+apiAdditions+"KeyRandom",function(data){
-                let chsum = 0;
-                for(let i = 0; i < naam.length; i++){
-                    chsum += naam.charCodeAt(i)
-                }
+                let chsum = generateCHS(naam);
                 var rsa = new RSAKey();
                 rsa.setPublic(data["modulo"],"10001")
                 let url = serverAddress+apiAdditions+"addGroup/"+naam
                 var http = new XMLHttpRequest();
                 http.open('POST', url, false);
-                http.setRequestHeader("Content-Type", 'text/plain');
                 http.send(hex2b64(rsa.encrypt(decimalToHex(chsum,8)+decimalToHex(data["rand"],8)+"shit")))
                 console.log("verzonden...")
+
+                data["rand"]++;
+                if(data["rand"] > 4294967296){
+                    data["rand"] = 0
+                }
             })
         }
     }

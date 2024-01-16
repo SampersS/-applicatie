@@ -3,6 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>add html</title>
+    <script src="./lib/prng4.js"></script>
+    <script src="./lib/rng.js"></script>
+    <script src="./lib/jsbn.js"></script>
+    <script src="./lib/rsa.js"></script>
+    <script src="./lib/base64.js"></script>
+    <script src="./lib/tools.js"></script>
 </head>
 <body onload="prepare()">
 <h1>Voeg een entry toe</h1>
@@ -33,7 +39,7 @@
     <button onclick="sendData()" id="btnSubmit" disabled>Verstuur</button>
 </body>
 <script>
-const serverAddress = "http://192.168.0.2"
+const serverAddress = "http://127.0.0.1"
 const apiAdditions = ":3000/backend/"
 const apiIMGAdditions = ":3000/backendIMG/"
 var Image = null
@@ -72,42 +78,50 @@ const getFile = function(){
     }
 }
 const sendData = function(){
-    let selecvalu = document.getElementById("Kanjimode").value;
-    let groepElement = document.getElementById("groepen");
-    let uitspraakElement = document.getElementById("txtUitspraak")
-    let betekenisElement = document.getElementById("txtBetekenis")
-    let charElement = document.getElementById("txtChar")
-    let kanjigeschrevenElement = document.getElementById("txtKanjiWrite")
-    let notitieElement = document.getElementById("txtNotitie")
-    let urlparm = ""
-    if(notitieElement.value == "") {notitieElement.value = " "}
-    if(selecvalu == "charakter_tabel"){
-        urlparm = "postKanji/"
-        urlparm += groepElement.value + "/"
-        urlparm += uitspraakElement.value +"/"
-        urlparm += betekenisElement.value +"/"
-        urlparm += charElement.value +"/"
-        urlparm += Image.name + "/"
-        urlparm += notitieElement.value+"/"
-        
-        let formData = new FormData();
-        formData.append('file', Image);
+    GetData(serverAddress+apiAdditions+"KeyRandom",function(data){
+        let selecvalu = document.getElementById("Kanjimode").value;
+        let groepElement = document.getElementById("groepen");
+        let uitspraakElement = document.getElementById("txtUitspraak")
+        let betekenisElement = document.getElementById("txtBetekenis")
+        let charElement = document.getElementById("txtChar")
+        let kanjigeschrevenElement = document.getElementById("txtKanjiWrite")
+        let notitieElement = document.getElementById("txtNotitie")
+        let urlparm = ""
+        if(notitieElement.value == "") {notitieElement.value = " "}
+        var rsa = new RSAKey();
+        rsa.setPublic(data["modulo"],"10001")
+        if(selecvalu == "charakter_tabel"){
+            urlparm = "postKanji/"
+            urlparm += groepElement.value + "/"
+            urlparm += uitspraakElement.value +"/"
+            urlparm += betekenisElement.value +"/"
+            urlparm += charElement.value +"/"
+            urlparm += Image.name + "/"
+            urlparm += notitieElement.value+"/"
+            let formData = new FormData();
+            formData.append('authenticatie',hex2b64(rsa.encrypt(decimalToHex(generateCHS(Image.size),8)+decimalToHex(data["rand"],8)+"shit")))
+            formData.append('file', Image);
+            var http = new XMLHttpRequest();
+            var url = serverAddress+apiIMGAdditions+Image.size;
+            http.open('POST', url, false);
+            http.send(formData);
+            data["rand"]++;
+            if(data["rand"] > 4294967296){
+                data["rand"] = 0
+            }
+        }else{
+            urlparm = "postWoord/"
+            urlparm += groepElement.value+"/"
+            urlparm += uitspraakElement.value+"/"
+            urlparm += kanjigeschrevenElement.value+"/"
+            urlparm += betekenisElement.value+"/"
+            urlparm += notitieElement.value+"/"
+        }
         var http = new XMLHttpRequest();
-        var url = serverAddress+apiIMGAdditions;
-        http.open('POST', url, false);
-        http.send(formData);
-    }else{
-        urlparm = "postWoord/"
-        urlparm += groepElement.value+"/"
-        urlparm += uitspraakElement.value+"/"
-        urlparm += kanjigeschrevenElement.value+"/"
-        urlparm += betekenisElement.value+"/"
-        urlparm += notitieElement.value+"/"
-    }
-    var http = new XMLHttpRequest();
-    http.open('POST', serverAddress+apiAdditions+urlparm);
-    http.send();
-    window.location.href = "index.html"
+        http.open('POST', serverAddress+apiAdditions+urlparm);
+        //http.send();
+        //window.location.href = "index.html"
+    })
 }
 const fileSendTest = function(){
     let formData = new FormData();

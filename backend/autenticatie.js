@@ -19,7 +19,11 @@ const GetRandomModulus = function(req, res){
     IpRandomPaaren[req.socket.remoteAddress] = Math.floor(Math.random() * 4294967296); //random integer van 0 tot 0xffffffff
     res.json({"rand":IpRandomPaaren[req.socket.remoteAddress],"modulo":publicModulus})
 }
-const Validate = function(req, res, encryptedData, checksumMateriaal){   //deencrypted: rand(8) checksum(8) password in decimaal uitgedrukte ()=hoeveel hexadecimale plaats innemen msb links
+const Validate = function(req, res, encryptedData, chstring){   //deencrypted: rand(8) checksum(8) password in decimaal uitgedrukte ()=hoeveel hexadecimale plaats innemen msb links
+    let chsum = 0;
+    for(let i = 0; i < chstring.length; i++){
+      chsum += chstring.charCodeAt(i)
+    }
     const decryptedData = crypto.privateDecrypt(
     {
         key: privateKey,
@@ -28,8 +32,12 @@ const Validate = function(req, res, encryptedData, checksumMateriaal){   //deenc
     let checksum = Number("0x"+decryptedData.substring(0,8))
     let rand = Number("0x"+decryptedData.substring(8,16))
     let swordpas = decryptedData.substring(16)
-    if(checksum == checksumMateriaal && rand == IpRandomPaaren[req.socket.remoteAddress] && swordpas == process.env.API_WACHTWOORD){
-        console.log(swordpas)
+    console.log(checksum, rand, swordpas)
+    if(checksum == chsum && rand == IpRandomPaaren[req.socket.remoteAddress] && swordpas == process.env.API_WACHTWOORD){
+        IpRandomPaaren[req.socket.remoteAddress]++;
+        if(IpRandomPaaren[req.socket.remoteAddress] > 4294967296){
+            IpRandomPaaren[req.socket.remoteAddress] = 0
+        }
         return true;
     }else{
         res.status(401).send("niet toegestaan")
