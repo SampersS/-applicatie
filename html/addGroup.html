@@ -24,26 +24,15 @@
     </table>
 </body>
 <script>
-    const serverAddress = "http://127.0.0.1"
-    const apiAdditions = ":3000/backend/"
     const sendNew = function(){
         let naam = document.getElementById("txtnaam").value
         if(naam != ""){
-            GetData(serverAddress+apiAdditions+"KeyRandom",function(data){
-                let chsum = generateCHS(naam);
-                var rsa = new RSAKey();
-                rsa.setPublic(data["modulo"],"10001")
-                let url = serverAddress+apiAdditions+"addGroup/"+naam
-                var http = new XMLHttpRequest();
-                http.open('POST', url, false);
-                http.send(hex2b64(rsa.encrypt(decimalToHex(chsum,8)+decimalToHex(data["rand"],8)+"shit")))
-                console.log("verzonden...")
-
-                data["rand"]++;
-                if(data["rand"] > 4294967296){
-                    data["rand"] = 0
-                }
-            })
+            let chsum = generateCHS(naam);
+            let url = serverAddress+apiAdditions+"addGroup/"+naam
+            var http = new XMLHttpRequest();
+            http.open('POST', url, false);
+            http.setRequestHeader("authorization",cryptograaf("shit", naam, false))
+            http.send()
         }
     }
     const prepare = function(){
@@ -60,17 +49,8 @@
                 cel1.appendChild(id)
                 cel2.appendChild(naam)
             }
+            getMeta()
         })
     }
-    const GetData = function(url, callback){
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            callback(JSON.parse(xhttp.responseText))
-        }
-    };
-    xhttp.open("GET", url, true);
-    xhttp.send();
-}
 </script>
 </html>

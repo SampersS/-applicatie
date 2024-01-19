@@ -25,7 +25,7 @@ app.get('/backend/', (req, res) => {
   console.log("gotten")
 })
 app.get("/backend/generate50/:groupid/:kanjidb/:mode", (req, res) => { //#
-  if(auth.Validate(req,res,req.body,req.params.groepid + req.params.kanjidb + req.params.mode)){
+  if(auth.Validate(req,res,req.headers.authorization,req.params.groupid + req.params.kanjidb + req.params.mode)){
     databasehelper.ServerGenerate50Questions(req, res, req.params["groupid"], req.params["kanjidb"], req.params["mode"], function(data){
       Opvragingen = data
       VraagendIP = req.socket.remoteAddress;
@@ -57,17 +57,17 @@ app.get("/backend/getQuestion", (req, res) => { //werk met een soort van allowed
   arrayindex++
 })
 app.put("/backend/returnResult/:id/:db/:mode/:fwaarde", (req, res) => { //#
-  if(auth.Validate(req,res,req.body,req.params.id + req.params.uitspraak + req.params.mode + req.params.fwaarde)){
+  if(auth.Validate(req,res,req.headers.authorization,req.params.id + req.params.db + req.params.mode + req.params.fwaarde)){
     databasehelper.QuestionReturn(req, res, req.params.id,req.params.db,req.params.mode,req.params.fwaarde)
   }
 })
 app.post("/backend/postWoord/:groepid/:uitspraak/:kanji/:betekenis/:notitie", (req, res) => { //#
-    if(auth.Validate(req,res,req.body,req.params.groepid + req.params.uitspraak + req.params.kanji + req.params.betekenis + req.params.notitie)){
+    if(auth.Validate(req,res,req.headers.authorization,req.params.groepid + req.params.uitspraak + req.params.kanji + req.params.betekenis + req.params.notitie)){
       databasehelper.PostWoord(req, res, req.params.groepid,req.params.uitspraak,req.params.kanji,req.params.betekenis,req.params.notitie)
     }
 })
 app.post("/backend/postKanji/:groepid/:uitspraak/:betekenis/:kanji/:img/:notitie", (req, res) => { //#
-  if(auth.Validate(req,res,req.body,req.params.groepid + req.params.uitspraak + req.params.betekenis + req.params.kanji + req.params.img + req.params.notitie)){
+  if(auth.Validate(req,res,req.headers.authorization,req.params.groepid + req.params.uitspraak + req.params.betekenis + req.params.kanji + req.params.img + req.params.notitie)){
     databasehelper.PostKanji(req, res, req.params.groepid,req.params.uitspraak,req.params.betekenis,req.params.kanji,req.params.img,req.params.notitie)
   }
 })
@@ -75,27 +75,27 @@ app.get("/backend/getGroups",(req,res)=>{
   databasehelper.GetGroups(req,res)
 })
 app.post("/backend/addGroup/:name",(req,res)=>{ //#
-  if(auth.Validate(req,res,req.body,req.params.name)){
+  if(auth.Validate(req,res,req.headers.authorization,req.params.name)){
     databasehelper.AddGroup(req,res,req.params.name)
   }
 })
 app.delete("/backend/deleteGroup/:id",(req,res)=>{ //#
-  if(auth.Validate(req,res,req.body,req.params.id)){
+  if(auth.Validate(req,res,req.headers.authorization,req.params.id)){
     databasehelper.DeleteGroup(req,res,req.params.id)
   }
 })
 app.delete("/backend/deleteWoord/:id",(req,res)=>{ //#
-  if(auth.Validate(req,res,req.body,req.params.id)){
+  if(auth.Validate(req,res,req.headers.authorization,req.params.id)){
     databasehelper.RemoveWord(req,res,req.params.id)
   }
 })
 app.delete("/backend/deleteKanji/:id",(req,res)=>{ //#
-  if(auth.Validate(req,res,req.body,req.params.id)){
+  if(auth.Validate(req,res,req.headers.authorization,req.params.id)){
     databasehelper.RemoveKanji(req,res,req.params.id)
   }
 })
 app.get("/backend/getEntries/:table",(req,res)=>{ //#
-  if(auth.Validate(req,res,req.body,req.params.table)){
+  if(auth.Validate(req,res,req.headers.authorization,req.params.table)){
     databasehelper.GetAllEntries(req,res,req.params.table)
   }
 })
@@ -106,8 +106,7 @@ app.get("/backend/KeyRandom",(req, res)=>{
   auth.GetRandomModulus(req,res)
 })
 app.post("/backendIMG/:size", async (req, res) => { //#
-  console.log(req.body.authenticatie)
-  if(auth.Validate(req,res,req.body.authenticatie,req.params.size)){
+  if(auth.Validate(req,res,req.headers.authorization,req.params.size)){
     try{
       await util.promisify(fileHelper.upload.single("file"))(req , res);
       if(req.file == undefined){
@@ -120,13 +119,11 @@ app.post("/backendIMG/:size", async (req, res) => { //#
     }
   }
 });
-app.get("/backendIMG/:id", (req, res) => { //#
-  if(auth.Validate(req,res,req.body,req.params.id)){
+app.get("/backendIMG/:id", (req, res) => {
     fileHelper.sendFile(req, res)
-  }
 })
 app.delete("/backendIMG/:id", (req, res) => { //#
-  if(auth.Validate(req,res,req.body,req.params.id)){
+  if(auth.Validate(req,res,req.headers.authorization,req.params.id)){
     fileHelper.deleteFile(req,res)
   }
 })

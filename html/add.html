@@ -9,6 +9,84 @@
     <script src="./lib/rsa.js"></script>
     <script src="./lib/base64.js"></script>
     <script src="./lib/tools.js"></script>
+    <script>
+        var Image = null
+        const nextModeEnable = function(){
+            let selecvalu = document.getElementById("Kanjimode").value;
+            let kanjiElement = document.getElementById("kanjimode")
+            let vocabElement = document.getElementById("vocabmode")
+            let subBut = document.getElementById("btnSubmit")
+            subBut.disabled = false
+            kanjiElement.style.display = "none"
+            vocabElement.style.display = "none"
+            if(selecvalu == "charakter_tabel"){
+                kanjiElement.style.display = "block"
+            }else if(selecvalu == "woordenschat_tabel"){
+                vocabElement.style.display = "block"
+            }else{
+                subBut.disabled = true
+            }
+        }
+        const prepare = function(){
+            let string = serverAddress+apiAdditions+"getGroups"
+            let groepElement = document.getElementById("groepen");
+            GetData(string, function(data){
+                for (let index = 0; index < data.length; index++) {
+                    option = new Option(data[index].naam, data[index].idgroep_namen);
+                    groepElement.add( option );
+                    console.log(data[index])
+                }
+                getMeta();
+            })
+        }
+        const getFile = function(){
+            let fileelement = document.getElementById("file_input")
+            if(fileelement.files.length!=0 && fileelement.files[0].type.indexOf("image") != -1){
+                console.log(fileelement.files[0].size)
+                Image = fileelement.files[0]
+            }
+        }
+        const sendData = function(){   
+            let selecvalu = document.getElementById("Kanjimode").value;
+            let groepElement = document.getElementById("groepen");
+            let uitspraakElement = document.getElementById("txtUitspraak")
+            let betekenisElement = document.getElementById("txtBetekenis")
+            let charElement = document.getElementById("txtChar")
+            let kanjigeschrevenElement = document.getElementById("txtKanjiWrite")
+            let notitieElement = document.getElementById("txtNotitie")
+            let urlparm = []
+            urlparm["pad"] = ""
+            if(notitieElement.value == "") {notitieElement.value = " "}
+            if(selecvalu == "charakter_tabel"){
+                urlparm["ap"] = "postKanji/"
+                urlparm["pad"] += groepElement.value + "/"
+                urlparm["pad"] += uitspraakElement.value +"/"
+                urlparm["pad"] += betekenisElement.value +"/"
+                urlparm["pad"] += charElement.value +"/"
+                urlparm["pad"] += Image.name + "/"
+                urlparm["pad"] += notitieElement.value+"/"
+                let formData = new FormData();
+                formData.append('file', Image);
+                var http = new XMLHttpRequest();
+                var url = serverAddress+apiIMGAdditions+Image.size;
+                http.open('POST', url, false);
+                http.setRequestHeader("authorization",cryptograaf("shit", Image.size, false))
+                http.send(formData);
+            }else{
+                urlparm["ap"] = "postWoord/"
+                urlparm["pad"] += groepElement.value+"/"
+                urlparm["pad"] += uitspraakElement.value+"/"
+                urlparm["pad"] += kanjigeschrevenElement.value+"/"
+                urlparm["pad"] += betekenisElement.value+"/"
+                urlparm["pad"] += notitieElement.value+"/"
+            }
+            var http = new XMLHttpRequest();
+            http.open('POST', serverAddress+apiAdditions+urlparm["ap"]+urlparm["pad"]);
+            http.setRequestHeader("authorization",cryptograaf("shit", urlparm["pad"], true))
+            http.send();
+            window.location.href = "index.html"
+        }
+        </script>
 </head>
 <body onload="prepare()">
 <h1>Voeg een entry toe</h1>
@@ -38,108 +116,4 @@
     <input id="txtNotitie"><br>
     <button onclick="sendData()" id="btnSubmit" disabled>Verstuur</button>
 </body>
-<script>
-const serverAddress = "http://127.0.0.1"
-const apiAdditions = ":3000/backend/"
-const apiIMGAdditions = ":3000/backendIMG/"
-var Image = null
-const nextModeEnable = function(){
-    let selecvalu = document.getElementById("Kanjimode").value;
-    let kanjiElement = document.getElementById("kanjimode")
-    let vocabElement = document.getElementById("vocabmode")
-    let subBut = document.getElementById("btnSubmit")
-    subBut.disabled = false
-    kanjiElement.style.display = "none"
-    vocabElement.style.display = "none"
-    if(selecvalu == "charakter_tabel"){
-        kanjiElement.style.display = "block"
-    }else if(selecvalu == "woordenschat_tabel"){
-        vocabElement.style.display = "block"
-    }else{
-        subBut.disabled = true
-    }
-}
-const prepare = function(){
-    let string = serverAddress+apiAdditions+"getGroups"
-    let groepElement = document.getElementById("groepen");
-    GetData(string, function(data){
-        for (let index = 0; index < data.length; index++) {
-            option = new Option(data[index].naam, data[index].idgroep_namen);
-            groepElement.add( option );
-            console.log(data[index])
-        }
-    })
-}
-const getFile = function(){
-    let fileelement = document.getElementById("file_input")
-    if(fileelement.files.length!=0 && fileelement.files[0].type.indexOf("image") != -1){
-        console.log(fileelement.files[0].size)
-        Image = fileelement.files[0]
-    }
-}
-const sendData = function(){
-    GetData(serverAddress+apiAdditions+"KeyRandom",function(data){
-        let selecvalu = document.getElementById("Kanjimode").value;
-        let groepElement = document.getElementById("groepen");
-        let uitspraakElement = document.getElementById("txtUitspraak")
-        let betekenisElement = document.getElementById("txtBetekenis")
-        let charElement = document.getElementById("txtChar")
-        let kanjigeschrevenElement = document.getElementById("txtKanjiWrite")
-        let notitieElement = document.getElementById("txtNotitie")
-        let urlparm = ""
-        if(notitieElement.value == "") {notitieElement.value = " "}
-        var rsa = new RSAKey();
-        rsa.setPublic(data["modulo"],"10001")
-        if(selecvalu == "charakter_tabel"){
-            urlparm = "postKanji/"
-            urlparm += groepElement.value + "/"
-            urlparm += uitspraakElement.value +"/"
-            urlparm += betekenisElement.value +"/"
-            urlparm += charElement.value +"/"
-            urlparm += Image.name + "/"
-            urlparm += notitieElement.value+"/"
-            let formData = new FormData();
-            formData.append('authenticatie',hex2b64(rsa.encrypt(decimalToHex(generateCHS(Image.size),8)+decimalToHex(data["rand"],8)+"shit")))
-            formData.append('file', Image);
-            var http = new XMLHttpRequest();
-            var url = serverAddress+apiIMGAdditions+Image.size;
-            http.open('POST', url, false);
-            http.send(formData);
-            data["rand"]++;
-            if(data["rand"] > 4294967296){
-                data["rand"] = 0
-            }
-        }else{
-            urlparm = "postWoord/"
-            urlparm += groepElement.value+"/"
-            urlparm += uitspraakElement.value+"/"
-            urlparm += kanjigeschrevenElement.value+"/"
-            urlparm += betekenisElement.value+"/"
-            urlparm += notitieElement.value+"/"
-        }
-        var http = new XMLHttpRequest();
-        http.open('POST', serverAddress+apiAdditions+urlparm);
-        //http.send();
-        //window.location.href = "index.html"
-    })
-}
-const fileSendTest = function(){
-    let formData = new FormData();
-    formData.append('file', Image);
-    var http = new XMLHttpRequest();
-    var url = serverAddress+apiIMGAdditions;
-    http.open('POST', url);
-    http.send(formData);
-}
-const GetData = function(url, callback){
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            callback(JSON.parse(xhttp.responseText))
-        }
-    };
-    xhttp.open("GET", url, true);
-    xhttp.send();
-}
-</script>
 </html>

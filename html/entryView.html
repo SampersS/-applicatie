@@ -3,8 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>Document</title>
+    <script src="./lib/prng4.js"></script>
+    <script src="./lib/rng.js"></script>
+    <script src="./lib/jsbn.js"></script>
+    <script src="./lib/rsa.js"></script>
+    <script src="./lib/base64.js"></script>
+    <script src="./lib/tools.js"></script>
 </head>
-<body>
+<body onload="getMeta()">
     <select name="Kanjimode" id="Kanjimode" onchange="nextModeEnable()">
         <option value=""></option>
         <option value="charakter_tabel">Kanji</option>
@@ -34,9 +40,6 @@
     </table>
 </body>
 <script>
-    const serverAddress = "http://192.168.0.2"
-    const apiAdditions = ":3000/backend/"
-    const apiIMGAdditions = ":3000/backendIMG/"
     const ExtraRows = 2
     var curData
     const nextModeEnable = function(){
@@ -57,7 +60,7 @@
         GetData(serverAddress+apiAdditions+"getEntries/"+element.value, function(data){
             curData = data
             RefreshList()
-        })
+        },cryptograaf("shit", element.value, false))
     }
     const RefreshList = function(){
         let data = curData
@@ -68,50 +71,50 @@
             tabel.deleteRow(ExtraRows);
         }
         for(let index = 0; index < data.length; index++){
-                let newrow = tabel.insertRow()
-                let cel1 = newrow.insertCell();
-                let cel2 = newrow.insertCell()
-                let cel3 = newrow.insertCell();
-                let cel4 = newrow.insertCell();
-                let cel5 = newrow.insertCell();
-                let cel6 = newrow.insertCell();
-                let cel7 = newrow.insertCell();
-                let cel8 = newrow.insertCell();
-                let id_nr
-                if(element.value == "charakter_tabel"){
-                    id_nr = data[index].idcharakter_tabel
-                    let id = document.createTextNode(data[index].idcharakter_tabel);
-                    cel1.appendChild(id)
-                    let gr = document.createTextNode(data[index].groep_id);
-                    cel2.appendChild(gr)
-                    let uv = document.createTextNode(data[index]["uitspraak voorbeeld"]);
-                    cel3.appendChild(uv)
-                    let bet = document.createTextNode(data[index].betekenis);
-                    cel4.appendChild(bet)
-                    let ch = document.createTextNode(data[index].ckarakter);
-                    cel5.appendChild(ch)
-                    let im = document.createTextNode(data[index].img);
-                    cel6.appendChild(im)
-                }else{
-                    id_nr = data[index].idwoordenschat_tabel
-                    id = document.createTextNode(data[index].idwoordenschat_tabel);
-                    cel1.appendChild(id)
-                    let gr = document.createTextNode(data[index].groep_id);
-                    cel2.appendChild(gr)
-                    let uv = document.createTextNode(data[index]["romaji_uitspraak"]);
-                    cel3.appendChild(uv)
-                    let kj = document.createTextNode(data[index].kanji);
-                    cel4.appendChild(kj)
-                    let bet = document.createTextNode(data[index].betekenis);
-                    cel5.appendChild(bet)
-                }
-                let nt = document.createTextNode(data[index].notitie);
-                cel7.appendChild(nt)
-                let bt = document.createElement("BUTTON");
-                bt.appendChild(document.createTextNode("verwijder"));
-                bt.addEventListener("click", function(){Delete(id_nr,index+ExtraRows)});
-                cel8.appendChild(bt)
+            let newrow = tabel.insertRow()
+            let cel1 = newrow.insertCell();
+            let cel2 = newrow.insertCell()
+            let cel3 = newrow.insertCell();
+            let cel4 = newrow.insertCell();
+            let cel5 = newrow.insertCell();
+            let cel6 = newrow.insertCell();
+            let cel7 = newrow.insertCell();
+            let cel8 = newrow.insertCell();
+            let id_nr
+            if(element.value == "charakter_tabel"){
+                id_nr = data[index].idcharakter_tabel
+                let id = document.createTextNode(data[index].idcharakter_tabel);
+                cel1.appendChild(id)
+                let gr = document.createTextNode(data[index].groep_id);
+                cel2.appendChild(gr)
+                let uv = document.createTextNode(data[index]["uitspraak voorbeeld"]);
+                cel3.appendChild(uv)
+                let bet = document.createTextNode(data[index].betekenis);
+                cel4.appendChild(bet)
+                let ch = document.createTextNode(data[index].ckarakter);
+                cel5.appendChild(ch)
+                let im = document.createTextNode(data[index].img);
+                cel6.appendChild(im)
+            }else{
+                id_nr = data[index].idwoordenschat_tabel
+                id = document.createTextNode(data[index].idwoordenschat_tabel);
+                cel1.appendChild(id)
+                let gr = document.createTextNode(data[index].groep_id);
+                cel2.appendChild(gr)
+                let uv = document.createTextNode(data[index]["romaji_uitspraak"]);
+                cel3.appendChild(uv)
+                let kj = document.createTextNode(data[index].kanji);
+                cel4.appendChild(kj)
+                let bet = document.createTextNode(data[index].betekenis);
+                cel5.appendChild(bet)
             }
+            let nt = document.createTextNode(data[index].notitie);
+            cel7.appendChild(nt)
+            let bt = document.createElement("BUTTON");
+            bt.appendChild(document.createTextNode("verwijder"));
+            bt.addEventListener("click", function(){Delete(id_nr,index+ExtraRows)});
+            cel8.appendChild(bt)
+        }
     }
     const Delete = function(id, index){
         console.log("te verwijderen:",index)
@@ -123,25 +126,17 @@
             url += "deleteKanji/"
             var xhttp2 = new XMLHttpRequest();
             xhttp2.open("DELETE", serverAddress+apiIMGAdditions+tabelElement.rows[index].cells[5].textContent ,true);
+            xhttp2.setRequestHeader("authorization",cryptograaf("shit", tabelElement.rows[index].cells[5].textContent , false))
             xhttp2.send();
         }else{
             url += "deleteWoord/"
         }
         url += id
         xhttp.open("DELETE", url, true);
+        xhttp.setRequestHeader("authorization",cryptograaf("shit", id, false))
         xhttp.send();
         curData.splice(index-ExtraRows,1)
         RefreshList()
-    }
-    const GetData = function(url, callback){
-        var xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                callback(JSON.parse(xhttp.responseText))
-            }
-        };
-        xhttp.open("GET", url, true);
-        xhttp.send();
     }
 </script>
 </html>

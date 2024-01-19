@@ -26,9 +26,9 @@ let configConnect = (returnCode) => {
 
 const ServerGenerate50Questions = (req, res,group,tabel,mode,callback) => {
   configConnect(function(connection){
-        const queryry = "SELECT *, (TIMESTAMPDIFF(HOUR, l_opvraag_naar_"+mode+",NOW())*(4+foutwaarde_naar_"+mode+")) as berekening FROM "+tabel+" where groep_id="+group+" order by berekening desc limit 50;"
+        const queryry = "SELECT *, (TIMESTAMPDIFF(HOUR, ??,NOW())*(4+??)) as berekening FROM ?? where groep_id=? order by berekening desc limit 50;"
         console.log(queryry)
-        connection.query(queryry, (err, data) => {
+        connection.query(queryry, ["l_opvraag_naar_"+mode,"foutwaarde_naar_"+mode, tabel,group], (err, data) => {
         if(err){
             res.set({
                 "CacheControl":"no-cache",
@@ -51,9 +51,9 @@ const ServerGenerate50Questions = (req, res,group,tabel,mode,callback) => {
 
 const QuestionReturn = (req, res,id,tabel,mode,fwaarde) => {
     configConnect(function(connection){
-        const queryry = "update "+tabel+" Set l_opvraag_naar_"+mode+" =now(), foutwaarde_naar_"+mode+" = "+ fwaarde +" where id"+tabel + " = "+id;
+        const queryry = "update ?? Set ??=now(), ?? = ? where ?? = ?";
         console.log(queryry)
-        connection.query(queryry, (err, data) => {
+        connection.query(queryry, [tabel,"l_opvraag_naar_"+mode,"foutwaarde_naar_"+mode, fwaarde,"id"+tabel, id], (err, data) => {
             if(err){
                 res.status(404).send({error:'sou da warui no jibun janai'})
                 console.log("er was een error")
@@ -68,9 +68,9 @@ const QuestionReturn = (req, res,id,tabel,mode,fwaarde) => {
 
 const PostWoord = (req, res,groepid,uitspraak,kanji,betekenis,notitie) => {
     configConnect(function(connection){
-        const queryry = "insert into woordenschat_tabel values(null, "+groepid+",\""+uitspraak+"\", \""+kanji+"\", \""+betekenis+"\",DATE_SUB(now(), INTERVAL 24 HOUR),255,DATE_SUB(now(),INTERVAL 24 HOUR),255,\""+notitie+"\")"
+        const queryry = "insert into woordenschat_tabel values(null, ?,?,?,?,DATE_SUB(now(), INTERVAL 24 HOUR),255,DATE_SUB(now(),INTERVAL 24 HOUR),255,?)"
         console.log(queryry)
-        connection.query(queryry, (err, data) => {
+        connection.query(queryry,[groepid, uitspraak, kanji, betekenis, notitie], (err, data) => {
             if(err){
                 res.status(404).send({error:'sou da warui no jibun janai'})
                 console.log("er was een error")
@@ -84,9 +84,9 @@ const PostWoord = (req, res,groepid,uitspraak,kanji,betekenis,notitie) => {
 }
 const PostKanji = (req, res,groep_id,uitspraakvb, betekenis,chara,img,notitie) => {
     configConnect(function(connection){
-        const queryry = "insert into charakter_tabel values(null, "+groep_id+",\""+uitspraakvb+"\", \""+betekenis+"\", \""+chara+"\",\""+img+"\",DATE_SUB(now(), INTERVAL 24 HOUR),255,DATE_SUB(now(),INTERVAL 24 HOUR),255,\""+notitie+"\")"
+        const queryry = "insert into charakter_tabel values(null, ?,?,?,?,?,DATE_SUB(now(), INTERVAL 24 HOUR),255,DATE_SUB(now(),INTERVAL 24 HOUR),255,?)"
         console.log(queryry)
-        connection.query(queryry, (err, data) => {
+        connection.query(queryry,[groep_id, uitspraakvb, betekenis, chara, img, notitie], (err, data) => {
             if(err){
                 res.status(404).send({error:'sou da warui no jibun janai'})
                 console.log("er was een error")
@@ -100,9 +100,9 @@ const PostKanji = (req, res,groep_id,uitspraakvb, betekenis,chara,img,notitie) =
 }
 const RemoveWord = (req, res, id) => {
     configConnect(function(connection){
-        const queryry = "delete from `woordenschat_tabel` where idwoordenschat_tabel="+id+ " limit 1"
+        const queryry = "delete from `woordenschat_tabel` where idwoordenschat_tabel=? limit 1"
         console.log(queryry)
-        connection.query(queryry, (err, data) => {
+        connection.query(queryry, [id],(err, data) => {
             if(err){
                 res.status(404).send({error:'sou da warui no jibun janai'})
                 console.log("er was een error")
@@ -116,9 +116,9 @@ const RemoveWord = (req, res, id) => {
 }
 const RemoveKanji = (req, res, id) => {
     configConnect(function(connection){
-        const queryry = "delete from charakter_tabel where idcharakter_tabel="+id+ " limit 1"
+        const queryry = "delete from charakter_tabel where idcharakter_tabel=? limit 1"
         console.log(queryry)
-        connection.query(queryry, (err, data) => {
+        connection.query(queryry,[id], (err, data) => {
             if(err){
                 res.status(404).send({error:'sou da warui no jibun janai'})
                 console.log("er was een error")
@@ -156,8 +156,8 @@ const GetGroups = (req, res) => {
 }
 const AddGroup = (req, res,naam) => {
     configConnect(function(connection){
-        const queryry = "insert into groep_namen values(null,\""+naam+"\")"
-        connection.query(queryry, (err, data) => {
+        const queryry = "insert into groep_namen values(null,?)"
+        connection.query(queryry,[naam], (err, data) => {
             if(err){
                 res.status(404).send({error:'sou da warui no jibun janai'})
                 console.log("er was een error")
@@ -171,8 +171,8 @@ const AddGroup = (req, res,naam) => {
 }
 const DeleteGroup = (req, res,id) => {
     configConnect(function(connection){
-        const queryry = "delete from groep_namen where idgroep_namen="+id
-        connection.query(queryry, (err, data) => {
+        const queryry = "delete from groep_namen where idgroep_namen=?"
+        connection.query(queryry,[id], (err, data) => {
             if(err){
                 res.status(404).send({error:'sou da warui no jibun janai'})
                 console.log("er was een error")
@@ -186,8 +186,8 @@ const DeleteGroup = (req, res,id) => {
 }
 const GetAllEntries = (req, res,tableName) => {
     configConnect(function(connection){
-        const queryry = "select * from " + tableName
-        connection.query(queryry, (err, data) => {
+        const queryry = "select * from ??"
+        connection.query(queryry,[tableName], (err, data) => {
             if(err){
                 res.set({
                     "CacheControl":"no-cache",
@@ -209,8 +209,8 @@ const GetAllEntries = (req, res,tableName) => {
 }
 const GetSameVocab = (req, res, uitspraak) => {
     configConnect(function(connection){
-        const queryry = "select * from woordenschat_tabel where romaji_uitspraak=\""+uitspraak+"\""
-        connection.query(queryry, (err, data) => {
+        const queryry = "select * from woordenschat_tabel where romaji_uitspraak=?"
+        connection.query(queryry,[uitspraak], (err, data) => {
             if(err){
                 res.set({
                     "CacheControl":"no-cache",
