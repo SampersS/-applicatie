@@ -3,7 +3,6 @@ var random = 0
 const serverAddress = "http://127.0.0.1"
 const apiAdditions = ":3000/backend/"
 const apiIMGAdditions = ":3000/backendIMG/"
-var rsa = new RSAKey();
 function decimalToHex(d, padding) {
     var hex = Number(d).toString(16);
     while (hex.length < padding) {
@@ -40,7 +39,7 @@ const GetData = function(url, callback, auth){
     }
     xhttp.send();
 }
-function cryptograaf(wachtwoord, chsMateriaal, matIsUrl){
+function cryptograaf(chsMateriaal, matIsUrl){
     //matIsUrl: als het checksum materiaal in 1 string zit gescheden door '/'
     let cumMonster = ""
     if(matIsUrl){
@@ -51,5 +50,23 @@ function cryptograaf(wachtwoord, chsMateriaal, matIsUrl){
     }else{
         cumMonster = chsMateriaal
     }
-    return hex2b64(rsa.encrypt(decimalToHex(generateCHS(cumMonster),8)+decimalToHex(random++,8)+wachtwoord))
+    return hex2b64(rsa.encrypt(decimalToHex(generateCHS(cumMonster),8)+decimalToHex(random++,8)+getPassword()))
 }
+function PreparePassword(){
+    if(!window.sessionStorage){
+        let pwobject = document.getElementById("pwobj")
+        pwobject.display = pwobject.style.display = "block"
+    }
+    else if(sessionStorage.getItem("pw")==null){
+        window.location.href = "login.html"
+    }
+}
+function getPassword(){
+    if(!window.sessionStorage){
+        return document.getElementById("pwobj").value
+    }else
+    {
+        return sessionStorage.getItem("pw")
+    }
+}
+var rsa = new RSAKey();

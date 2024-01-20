@@ -10,13 +10,17 @@
     <script src="./lib/base64.js"></script>
     <script src="./lib/tools.js"></script>
 </head>
-<body onload="getMeta()">
+<body onload="PreparePassword();getMeta()">
+    <div id="pwobj" style="display:none">
+        <label for="txtPassword">Wachtwoord:</label><br>
+        <input type="password" id="txtPassword"><br>
+    </div>
     <select name="Kanjimode" id="Kanjimode" onchange="nextModeEnable()">
         <option value=""></option>
         <option value="charakter_tabel">Kanji</option>
         <option value="woordenschat_tabel">Woordenschat</option>
     </select>
-    <button onclick="window.location.href = 'index.html'">Terug</button><br>
+    <button onclick="window.location.href = 'menu.html'">Terug</button><br>
     <table id = "tabel">
         <tr style="display: none;" id="kanjiHeader">
             <th>id</th>
@@ -60,7 +64,7 @@
         GetData(serverAddress+apiAdditions+"getEntries/"+element.value, function(data){
             curData = data
             RefreshList()
-        },cryptograaf("shit", element.value, false))
+        },cryptograaf(element.value, false))
     }
     const RefreshList = function(){
         let data = curData
@@ -126,14 +130,14 @@
             url += "deleteKanji/"
             var xhttp2 = new XMLHttpRequest();
             xhttp2.open("DELETE", serverAddress+apiIMGAdditions+tabelElement.rows[index].cells[5].textContent ,true);
-            xhttp2.setRequestHeader("authorization",cryptograaf("shit", tabelElement.rows[index].cells[5].textContent , false))
+            xhttp2.setRequestHeader("authorization",cryptograaf(tabelElement.rows[index].cells[5].textContent , false))
             xhttp2.send();
         }else{
             url += "deleteWoord/"
         }
         url += id
         xhttp.open("DELETE", url, true);
-        xhttp.setRequestHeader("authorization",cryptograaf("shit", id, false))
+        xhttp.setRequestHeader("authorization",cryptograaf(id, false))
         xhttp.send();
         curData.splice(index-ExtraRows,1)
         RefreshList()

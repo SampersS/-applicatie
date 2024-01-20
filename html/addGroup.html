@@ -11,10 +11,14 @@
     <script src="./lib/tools.js"></script>
 </head>
 <body onload="prepare()">
+    <div id="pwobj" style="display:none">
+        <label for="txtPassword">Wachtwoord:</label><br>
+        <input type="password" id="txtPassword"><br>
+    </div>
     <p style="margin: 0px;">Naam:</p><br>
     <input type="text" id="txtnaam"><br>
     <button onclick="sendNew()">Voeg toe</button>
-    <button onclick="window.location.href = 'index.html'">Terug</button><br>
+    <button onclick="window.location.href = 'menu.html'">Terug</button><br>
     <p style="margin: 0px;">Ingaven:</p>
     <table id="tabel">
         <tr>
@@ -31,13 +35,14 @@
             let url = serverAddress+apiAdditions+"addGroup/"+naam
             var http = new XMLHttpRequest();
             http.open('POST', url, false);
-            http.setRequestHeader("authorization",cryptograaf("shit", naam, false))
+            http.setRequestHeader("authorization",cryptograaf(naam, false))
             http.send()
         }
     }
     const prepare = function(){
         let string = serverAddress+apiAdditions+"getGroups"
         let groepElement = document.getElementById("groepen");
+        PreparePassword()
         GetData(string, function(data){
             for (let index = 0; index < data.length; index++) {
                 let tabelElement = document.getElementById("tabel")

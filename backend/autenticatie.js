@@ -3,6 +3,9 @@ const crypto = require("crypto");
 const dotenv = require("dotenv")
 
 var IpRandomPaaren = []
+const UPLOAD_MODE = false;
+var requestsPerSecond = []
+var seconde = 80085;
 dotenv.config();
 //openssl rsa -in key1024.pem -noout -modulus
 var publicModulus = "A8A6949E7550D98C0C810BDC47BEE27603B5D7F087EAE317B9455AE06788E552330810046459163E90C206B84E56C38657FC154A072863B82BB4CE41EE33D47B02E1B89F100B48FA3E80D7DD41DFC430D75D3727F96DE138CC437A495F7ADEC60C3B2E8B47BBF050070D3F90C4BF9C32D675C9AC040FE5EFF2047BD9BA118A782AE9F39DA720FD69627AEF6A58248C5CF65F7C3B9609B8866B452120884FB9589ACFF0E59F81CA1B1D811B02F42024B0A6AED2A11EDAD64E49A9AF5A5D2FC4D2131757BE6BDB64BCF612EF25FBBEC1E121DCF55D34A4985B4E3D0A487D54B0CE63E81B0BAAD03F6E630EBA567DC4CCCEEC877AF4EDB7C8A0DDE890EFC9AF5E65"
@@ -20,6 +23,24 @@ const GetRandomModulus = function(req, res){
     res.json({"rand":IpRandomPaaren[req.socket.remoteAddress],"modulo":publicModulus})
 }
 const Validate = function(req, res, encryptedData, chstring){   //deencrypted: rand(8) checksum(8) password in decimaal uitgedrukte ()=hoeveel hexadecimale plaats innemen msb links
+    if(!UPLOAD_MODE){//brute force aanval verhelpen
+        if(seconde != Date.now()){
+            seconde = Date.now()
+            requestsPerSecond = []
+        }
+        if(requestsPerSecond[req.socket.remoteAddress]==undefined){
+            requestsPerSecond[req.socket.remoteAddress]=0
+        }
+        requestsPerSecond[req.socket.remoteAddress]+= 1
+        if(requestsPerSecond[req.socket.remoteAddress] > 5){
+            res.sendStatus(401)
+            fs.appendFile("warnings.log","iemand met ip: "+req.socket.remoteAddress+" probeert je server te hacken!!\n" , function(err){
+                console.log(err)
+            });
+            return false;
+        }
+    }
+    
     let chsum = 0;
     for(let i = 0; i < chstring.length; i++){
       chsum += chstring.charCodeAt(i)

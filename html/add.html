@@ -30,6 +30,7 @@
         const prepare = function(){
             let string = serverAddress+apiAdditions+"getGroups"
             let groepElement = document.getElementById("groepen");
+            PreparePassword()
             GetData(string, function(data){
                 for (let index = 0; index < data.length; index++) {
                     option = new Option(data[index].naam, data[index].idgroep_namen);
@@ -70,7 +71,7 @@
                 var http = new XMLHttpRequest();
                 var url = serverAddress+apiIMGAdditions+Image.size;
                 http.open('POST', url, false);
-                http.setRequestHeader("authorization",cryptograaf("shit", Image.size, false))
+                http.setRequestHeader("authorization",cryptograaf(Image.size, false))
                 http.send(formData);
             }else{
                 urlparm["ap"] = "postWoord/"
@@ -82,14 +83,18 @@
             }
             var http = new XMLHttpRequest();
             http.open('POST', serverAddress+apiAdditions+urlparm["ap"]+urlparm["pad"]);
-            http.setRequestHeader("authorization",cryptograaf("shit", urlparm["pad"], true))
+            http.setRequestHeader("authorization",cryptograaf(urlparm["pad"], true))
             http.send();
-            window.location.href = "index.html"
+            window.location.href = "menu.html"
         }
         </script>
 </head>
 <body onload="prepare()">
 <h1>Voeg een entry toe</h1>
+<div id="pwobj" style="display:none">
+    <label for="txtPassword">Wachtwoord:</label><br>
+    <input type="password" id="txtPassword"><br>
+</div>
 <p style="margin: 0px;">Selecteer je mode</p>
     <select name="Kanjimode" id="Kanjimode" onchange="nextModeEnable()">
         <option value=""></option>

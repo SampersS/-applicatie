@@ -3,20 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Main</title>
-    <script src="./lib/prng4.js"></script>
-    <script src="./lib/rng.js"></script>
-    <script src="./lib/jsbn.js"></script>
-    <script src="./lib/rsa.js"></script>
-    <script src="./lib/base64.js"></script>
     <script src="./lib/tools.js"></script>
 </head>
 <body>
-    <div id="inlogForm">
-        <label for="txtPassword">Wachtwoord:</label><br>
-        <input type="password" id="txtPassword"><br>
-        <button type="button" onclick="validation()">valideer Wachtwoord</button>
-    </div>
-    <div id="menu" style="display: none;">
+
+    <div id="menu">
         <div id="modeselecting">
             <p style="margin: 0px;">Selecteer je mode</p>
             <select name="Kanjimode" id="Kanjimode" onchange="nextModeEnable()">
@@ -41,10 +32,6 @@
     
 </body>
 <script>
-    const validation = function(){
-        document.getElementById("menu").style.display = "inline";
-        document.getElementById("inlogForm").style.display = "none";
-    }
     const nextModeEnable = function(){
         let richtingelement = document.getElementById("richtingmode");
         while (richtingelement.options.length > 0) {                

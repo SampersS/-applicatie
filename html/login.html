@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+</head>
+<body onload="check()">
+    <div id="inlogForm">
+        <label for="txtPassword">Wachtwoord:</label><br>
+        <input type="password" id="txtPassword"><br>
+        <button type="button" onclick="validation()">Binnen gaan</button>
+        <p>Als je wachtwoord verkeerd is zal niets werken!</p>
+    </div>
+    <script>
+        function validation(){
+            sessionStorage.setItem("pw", document.getElementById("txtPassword").value);
+            window.location.href = "menu.html"
+        }
+        function check(){
+            if(!window.sessionStorage){
+                window.location.href = "menu.html"
+            }
+        }
+    </script>
+</body>
+</html>

@@ -33,9 +33,8 @@ app.get("/backend/generate50/:groupid/:kanjidb/:mode", (req, res) => { //#
       arrayindex = 0
     })
   }
-  
 })
-app.get("/backend/getQuestion", (req, res) => { //werk met een soort van allowed ip, het laatste ip die 50 had opgevraagd, anders krijgt een client berich om opnieuw 50 te genereren
+app.get("/backend/getQuestion", (req, res) => {
   if(Opvragingen == [] || arrayindex == Opvragingen.length){
     res.set({
       "CacheControl":"no-cache",
@@ -46,7 +45,11 @@ app.get("/backend/getQuestion", (req, res) => { //werk met een soort van allowed
     return;
   }
   if(VraagendIP != req.socket.remoteAddress){
-    res.send("Genereer opnieuw")
+    res.set({
+      "CacheControl":"no-cache",
+      "Pragma":"no-cache",
+      "Expires":"-1"
+    }).send("error: ander apparaat opvraging")
     return;
   }
   res.set({
@@ -100,6 +103,10 @@ app.get("/backend/getEntries/:table",(req,res)=>{ //#
   }
 })
 app.get("/backend/zelfdeUitspraak/:uitspraak",(req,res)=>{
+  if(VraagendIP != req.socket.remoteAddress){
+    res.send(401)
+    return;
+  }
   databasehelper.GetSameVocab(req,res,req.params.uitspraak)
 })
 app.get("/backend/KeyRandom",(req, res)=>{
@@ -120,7 +127,11 @@ app.post("/backendIMG/:size", async (req, res) => { //#
   }
 });
 app.get("/backendIMG/:id", (req, res) => {
-    fileHelper.sendFile(req, res)
+  if(VraagendIP != req.socket.remoteAddress){
+    res.send(401)
+    return;
+  }
+  fileHelper.sendFile(req, res)
 })
 app.delete("/backendIMG/:id", (req, res) => { //#
   if(auth.Validate(req,res,req.headers.authorization,req.params.id)){

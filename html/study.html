@@ -12,6 +12,10 @@
 </head>
 <body onload="prepare()">
     <h1>Opvraging:</h1>
+    <div id="pwobj" style="display:none">
+        <label for="txtPassword">Wachtwoord:</label><br>
+        <input type="password" id="txtPassword"><br>
+    </div>
     <p id="veld1" style="margin: 0px;"></p>
     <p id="veld2" style="margin: 0px;"></p>
     <img src="" alt="" id="handzuimg" style="display: none;" >
@@ -62,6 +66,7 @@
                 OplossingLinks.Oploss = "romaji_uitspraak"
             }
         }
+        PreparePassword()
         getMeta()
     }
     const displayNextQuestion = function() {
@@ -73,13 +78,14 @@
                     return
                 }
                 GetData(serverAddress+apiAdditions+"getQuestion", DisplayData)
-            },cryptograaf("shit", groepid+tabel+colom, false))
+            },cryptograaf(groepid+tabel+colom, false))
         }else{
             GetData(serverAddress+apiAdditions+"getQuestion", DisplayData)  
         }
     }
     const DisplayData = function(data){
-        if(data=="Genereer opnieuw"){
+        if(data.toString().substring(0,5)=="error"){
+            console.error(data)
             queueReady = 0;
             displayNextQuestion();
             return;
@@ -145,7 +151,7 @@
         var http = new XMLHttpRequest();
         var url = serverAddress+apiAdditions+"returnResult/"+currentData["id"+tabel]+"/"+tabel+"/"+colom+"/"+foutwaarde;
         http.open('PUT', url, true);
-        http.setRequestHeader("authorization",cryptograaf("shit", currentData["id"+tabel]+tabel+colom+foutwaarde, false))
+        http.setRequestHeader("authorization",cryptograaf(currentData["id"+tabel]+tabel+colom+foutwaarde, false))
         http.send();
     }
 </script>
