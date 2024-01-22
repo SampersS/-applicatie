@@ -28,7 +28,7 @@ app.get("/backend/generate50/:groupid/:kanjidb/:mode", (req, res) => { //#
   if(auth.Validate(req,res,req.headers.authorization,req.params.groupid + req.params.kanjidb + req.params.mode)){
     databasehelper.ServerGenerate50Questions(req, res, req.params["groupid"], req.params["kanjidb"], req.params["mode"], function(data){
       Opvragingen = data
-      VraagendIP = req.socket.remoteAddress;
+      VraagendIP = auth.getIP(req);
       console.log(Opvragingen)
       arrayindex = 0
     })
@@ -44,7 +44,7 @@ app.get("/backend/getQuestion", (req, res) => {
     console.log(Opvragingen)
     return;
   }
-  if(VraagendIP != req.socket.remoteAddress){
+  if(VraagendIP != auth.getIP(req)){
     res.set({
       "CacheControl":"no-cache",
       "Pragma":"no-cache",
@@ -103,8 +103,8 @@ app.get("/backend/getEntries/:table",(req,res)=>{ //#
   }
 })
 app.get("/backend/zelfdeUitspraak/:uitspraak",(req,res)=>{
-  if(VraagendIP != req.socket.remoteAddress){
-    res.send(401)
+  if(VraagendIP != auth.getIP(req)){
+    res.sendStatus(401)
     return;
   }
   databasehelper.GetSameVocab(req,res,req.params.uitspraak)
@@ -127,7 +127,7 @@ app.post("/backendIMG/:size", async (req, res) => { //#
   }
 });
 app.get("/backendIMG/:id", (req, res) => {
-  if(VraagendIP != req.socket.remoteAddress){
+  if(VraagendIP != auth.getIP(req)){
     res.send(401)
     return;
   }

@@ -19,8 +19,8 @@ var privateKey1024 = crypto.createPrivateKey({
     'format': 'pem',
 });
 const GetRandomModulus = function(req, res){
-    IpRandomPaaren[req.socket.remoteAddress] = Math.floor(Math.random() * 4294960296);
-    res.json({"rand":IpRandomPaaren[req.socket.remoteAddress],"modulo":publicModulus})
+    IpRandomPaaren[getIP(req)] = Math.floor(Math.random() * 4294960296);
+    res.json({"rand":IpRandomPaaren[getIP(req)],"modulo":publicModulus})
 }
 const Validate = function(req, res, encryptedData, chstring){   //deencrypted: rand(8) checksum(8) password in decimaal uitgedrukte ()=hoeveel hexadecimale plaats innemen msb links
     if(!UPLOAD_MODE){//brute force aanval verhelpen
@@ -28,13 +28,13 @@ const Validate = function(req, res, encryptedData, chstring){   //deencrypted: r
             seconde = Date.now()
             requestsPerSecond = []
         }
-        if(requestsPerSecond[req.socket.remoteAddress]==undefined){
-            requestsPerSecond[req.socket.remoteAddress]=0
+        if(requestsPerSecond[getIP(req)]==undefined){
+            requestsPerSecond[getIP(req)]=0
         }
-        requestsPerSecond[req.socket.remoteAddress]+= 1
-        if(requestsPerSecond[req.socket.remoteAddress] > 5){
+        requestsPerSecond[getIP(req)]+= 1
+        if(requestsPerSecond[getIP(req)] > 5){
             res.sendStatus(401)
-            fs.appendFile("warnings.log","iemand met ip: "+req.socket.remoteAddress+" probeert je server te hacken!!\n" , function(err){
+            fs.appendFile("warnings.log","iemand met ip: "+getIP(req)+" probeert je server te hacken!!\n" , function(err){
                 console.log(err)
             });
             return false;
@@ -53,16 +53,19 @@ const Validate = function(req, res, encryptedData, chstring){   //deencrypted: r
     let checksum = Number("0x"+decryptedData.substring(0,8))
     let rand = Number("0x"+decryptedData.substring(8,16))
     let swordpas = decryptedData.substring(16)
-    if(checksum == chsum && rand == IpRandomPaaren[req.socket.remoteAddress] && swordpas == process.env.API_WACHTWOORD){
-        IpRandomPaaren[req.socket.remoteAddress]++;
-        if(IpRandomPaaren[req.socket.remoteAddress] > 4294967296){
-            IpRandomPaaren[req.socket.remoteAddress] = 0
+    if(checksum == chsum && rand == IpRandomPaaren[getIP(req)] && swordpas == process.env.API_WACHTWOORD){
+        IpRandomPaaren[getIP(req)]++;
+        if(IpRandomPaaren[getIP(req)] > 4294967296){
+            IpRandomPaaren[getIP(req)] = 0
         }
         return true;
     }else{
-        res.status(401).send("niet toegestaan")
-        console.log(checksum,chsum, rand, IpRandomPaaren[req.socket.remoteAddress], swordpas ,process.env.API_WACHTWOORD)
+        res.json({error:401})
+        console.log(checksum,chsum, rand, IpRandomPaaren[getIP(req)], swordpas ,process.env.API_WACHTWOORD)
         return false;
     }
 }
-module.exports = {GetRandomModulus, Validate}
+const getIP = function(req){
+    return req.headers['x-forwarded-for'] || req.socket.remoteAddress
+}
+module.exports = {GetRandomModulus, Validate, getIP}

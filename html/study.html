@@ -12,7 +12,7 @@
 </head>
 <body onload="prepare()">
     <h1>Opvraging:</h1>
-    <div id="pwobj" style="display:none">
+    <div id="pwobj">
         <label for="txtPassword">Wachtwoord:</label><br>
         <input type="password" id="txtPassword"><br>
     </div>
@@ -71,8 +71,12 @@
     }
     const displayNextQuestion = function() {
         if(queueReady == 0){
-            GetData(serverAddress+apiAdditions+"generate50/"+groepid+"/"+tabel+"/"+colom,function(ret){
-                console.log(ret)
+            GetData(serverAddress+apiAdditions+"generate50/"+groepid+"/"+tabel+"/"+colom,async function(ret){
+                if(ret.error == 401){
+                    await getMeta()
+                    displayNextQuestion()
+                    return;
+                }
                 queueReady = ret.lengte
                 if(queueReady==0){
                     return
