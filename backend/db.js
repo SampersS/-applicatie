@@ -24,11 +24,11 @@ let configConnect = (returnCode) => {
     });
 }
 
-const ServerGenerate50Questions = (req, res,group,tabel,mode,callback) => {
+const ServerGenerate100Questions = (req, res,group,tabel,mode,callback) => {
   configConnect(function(connection){
-        const queryry = "SELECT *, (TIMESTAMPDIFF(HOUR, ??,NOW())*(4+??)) as berekening FROM ?? where groep_id=? order by berekening desc limit 50;"
+        const queryry = "SELECT * FROM ?? where ?? = -1 and groep_id=?"
         console.log(queryry)
-        connection.query(queryry, ["l_opvraag_naar_"+mode,"foutwaarde_naar_"+mode, tabel,group], (err, data) => {
+        connection.query(queryry, [tabel,"opvraag_index_naar_"+mode,group], (err, data) => {
         if(err){
             res.set({
                 "CacheControl":"no-cache",
@@ -49,20 +49,48 @@ const ServerGenerate50Questions = (req, res,group,tabel,mode,callback) => {
     });})
 }
 
-const QuestionReturn = (req, res,id,tabel,mode,fwaarde) => {
+const QuestionReturn = (req, res,id,tabel,mode,fout) => {
     configConnect(function(connection){
-        const queryry = "update ?? Set ??=now(), ?? = ? where ?? = ?";
-        console.log(queryry)
-        connection.query(queryry, [tabel,"l_opvraag_naar_"+mode,"foutwaarde_naar_"+mode, fwaarde,"id"+tabel, id], (err, data) => {
+        const select = "select *, MAX(??) AS max_index ,(select MIN(??) from ?? where ?? !=-1) as min_index from ?? where ??=?"
+        connection.query(select, ["opvraag_index_naar_"+mode,"opvraag_index_naar_"+mode,tabel,"opvraag_index_naar_"+mode,"opvraag_index_naar_"+mode,tabel,"id"+tabel, id], (err, data) => {
+            let selected;
+            let extraSQL = ""
+            let extraParameters = []
             if(err){
-                res.status(404).send({error:'sou da warui no jibun janai'})
-                console.log("er was een error")
+                res.status(500)
+                console.log(err.message)
             }else{
-                //console.log('the query answer is: ', data);
-                res.status(200).send("ok");
+                selected = data[0]
+                if(fout){
+                    selected["aantal_fout_naar_"+mode]++;
+                    selected["juist_streak_naar_"+mode] = 0;
+                }else{
+                    if(selected["aantal_fout_naar_"+mode]==0 || selected["juist_streak_naar_"+mode]>0){
+                        //complex vanaf hier
+                        //nieuwe index selecteren
+                        selected["opvraag_index_naar_"+mode] = Math.floor(Math.exp(-selected["aantal_fout_naar_"+mode]*0.5) * (selected.max_index-selected.min_index)+selected.min_index)+1
+                        selected["juist_streak_naar_"+mode] = 0
+                        selected["aantal_fout_naar_"+mode] = 0
+                        extraSQL = "update tabel set ??=-1 where ?? = ? limit 1"
+                        extraParameters = ["opvraag_index_naar_"+mode,"id"+tabel, selected.min_index]
+                    }else{
+                        selected["juist_streak_naar_"+mode]++
+                    }
+                }
             }
-        });
-        connection.end()
+            const queryry = "update ?? Set ??=?, ??=?,??=? where ?? = ?;"+extraSQL;
+            console.log(queryry)
+            connection.query(queryry, [tabel,"opvraag_index_naar_"+mode,selected["opvraag_index_naar_"+mode],"aantal_fout_naar_"+mode,selected["aantal_fout_naar_"+mode],"juist_streak_naar_"+mode,selected["juist_streak_naar_"+mode],"id"+tabel, id].concat(extraParameters), (err, data) => {
+                if(err){
+                    res.status(404).send({error:'sou da warui no jibun janai'})
+                    console.log("er was een error")
+                }else{
+                    //console.log('the query answer is: ', data);
+                    res.status(200).send("ok");
+                }
+            });
+            connection.end()
+        }); 
     })
 }
 
@@ -230,4 +258,4 @@ const GetSameVocab = (req, res, uitspraak) => {
         connection.end()
     })
 }
-module.exports = {ServerGenerate50Questions, QuestionReturn,PostWoord, PostKanji, GetGroups, AddGroup, DeleteGroup, RemoveKanji, RemoveWord, GetAllEntries, GetSameVocab}
+module.exports = {ServerGenerate100Questions, QuestionReturn,PostWoord, PostKanji, GetGroups, AddGroup, DeleteGroup, RemoveKanji, RemoveWord, GetAllEntries, GetSameVocab}

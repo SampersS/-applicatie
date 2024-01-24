@@ -24,12 +24,11 @@ app.get('/backend/', (req, res) => {
   }).send('Verbinding met de backend is werkend!')
   console.log("gotten")
 })
-app.get("/backend/generate50/:groupid/:kanjidb/:mode", (req, res) => { //#
+app.get("/backend/generate100/:groupid/:kanjidb/:mode", (req, res) => { //#
   if(auth.Validate(req,res,req.headers.authorization,req.params.groupid + req.params.kanjidb + req.params.mode)){
-    databasehelper.ServerGenerate50Questions(req, res, req.params["groupid"], req.params["kanjidb"], req.params["mode"], function(data){
+    databasehelper.ServerGenerate100Questions(req, res, req.params["groupid"], req.params["kanjidb"], req.params["mode"], function(data){
       Opvragingen = data
       VraagendIP = auth.getIP(req);
-      console.log(Opvragingen)
       arrayindex = 0
     })
   }
@@ -59,9 +58,9 @@ app.get("/backend/getQuestion", (req, res) => {
   }).send(Opvragingen[arrayindex])
   arrayindex++
 })
-app.put("/backend/returnResult/:id/:db/:mode/:fwaarde", (req, res) => { //#
+app.put("/backend/returnResult/:id/:db/:mode/:fout", (req, res) => { //#
   if(auth.Validate(req,res,req.headers.authorization,req.params.id + req.params.db + req.params.mode + req.params.fwaarde)){
-    databasehelper.QuestionReturn(req, res, req.params.id,req.params.db,req.params.mode,req.params.fwaarde)
+    databasehelper.QuestionReturn(req, res, req.params.id,req.params.db,req.params.mode,req.params.fout)
   }
 })
 app.post("/backend/postWoord/:groepid/:uitspraak/:kanji/:betekenis/:notitie", (req, res) => { //#

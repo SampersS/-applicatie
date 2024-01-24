@@ -31,10 +31,12 @@ CREATE TABLE `charakter_tabel` (
   `betekenis` varchar(50) DEFAULT NULL,
   `ckarakter` varchar(4) DEFAULT NULL,
   `img` varchar(45) DEFAULT NULL,
-  `l_opvraag_naar_teken` datetime DEFAULT NULL,
-  `foutwaarde_naar_teken` int DEFAULT NULL,
-  `l_opvraag_naar_betekenis` datetime DEFAULT NULL,
-  `foutwaarde_naar_betekenis` int DEFAULT NULL,
+  `opvraag_index_naar_teken` int DEFAULT NULL,
+  `opvraag_index_naar_betekenis` int DEFAULT NULL,
+  `juist_streak_naar_teken` int DEFAULT NULL,
+  `juist_streak_naar_betekenis` int DEFAULT NULL,
+  `aantal_fout_naar_teken` int DEFAULT NULL,
+  `aantal_fout_naar_betekenis` int DEFAULT NULL,
   `notitie` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`idcharakter_tabel`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb3;
@@ -67,10 +69,12 @@ CREATE TABLE `woordenschat_tabel` (
   `romaji_uitspraak` varchar(20) DEFAULT NULL,
   `kanji` varchar(15) DEFAULT NULL,
   `betekenis` varchar(50) DEFAULT NULL,
-  `l_opvraag_naar_betekenis` datetime DEFAULT NULL,
-  `foutwaarde_naar_betekenis` int DEFAULT NULL,
-  `l_opvraag_naar_uitspraak` datetime DEFAULT NULL,
-  `foutwaarde_naar_uitspraak` int DEFAULT NULL,
+  `opvraag_index_naar_uitspraak` int DEFAULT NULL,
+  `opvraag_index_naar_betekenis` int DEFAULT NULL,
+  `juist_streak_naar_uitspraak` int DEFAULT NULL,
+  `juist_streak_naar_betekenis` int DEFAULT NULL,
+  `aantal_fout_naar_uitspraak` int DEFAULT NULL,
+  `aantal_fout_naar_betekenis` int DEFAULT NULL,
   `notitie` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`idwoordenschat_tabel`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb3;

@@ -11,20 +11,22 @@
     <script src="./lib/tools.js"></script>
 </head>
 <body onload="prepare()">
-    <h1>Opvraging:</h1>
-    <div id="pwobj">
+    <form action="console.log('drugs zak')" name="pwobj" hidden>
         <label for="txtPassword">Wachtwoord:</label><br>
         <input type="password" id="txtPassword"><br>
-    </div>
-    <p id="veld1" style="margin: 0px;"></p>
-    <p id="veld2" style="margin: 0px;"></p>
-    <img src="" alt="" id="handzuimg" style="display: none;" >
-    <p id="Oploss" style="margin: 0px;"></p>
-    <button type="button" onclick="ToonOploss()" id="btnOploss" disabled>Toon oplossing</button><br>
-    <Button type="button" onclick="rate('goed')" class="btnRate" disabled>Goed</Button>
-    <Button type="button" onclick="rate('fout')" class="btnRate" disabled>Fout</Button><br>
-    <Button type="button" onclick="displayNextQuestion()" id="btnNext">Volgende Vraag</Button><br>
-
+    </form>
+    <form action="console.log('L')" name="ioform">
+        <h1>Opvraging:</h1>
+        <textarea name="veld1" readonly hidden></textarea>
+        <textarea name="veld2" readonly hidden></textarea>
+        <img src="" alt="" id="handzuimg" hidden>
+        <p id="Oploss" style="margin: 0px;"></p>
+        <textarea name="Oploss" readonly hidden></textarea>
+        <input type="button" onclick="ToonOploss()" name="btnOploss" value="Toon oplossing"><br>
+        <input type="button" onclick="rate('goed')" name="goodrate" class="btnRate" disabled value="Goed">
+        <input type="button" onclick="rate('fout')" name="badrate" class="btnRate" disabled value="Fout"><br>
+        <input type="button" onclick="displayNextQuestion()" name="btnNext" value="Volgende Vraag"><br>
+    </form>
     <table id="tabel" style="display: none;">
         <tr>
             <th>Andere betekenissen:</th>
@@ -39,7 +41,7 @@
     var DisplayLinks = {}
     var OplossingLinks = {}
     var currentData = {}
-    const prepare = function() {
+    function prepare() {
         let urldata = window.location.search.split("?")
         console.log(urldata)
         tabel = urldata[1];
@@ -55,7 +57,7 @@
                 DisplayLinks.handzuimg = "img"
                 OplossingLinks.Oploss = "betekenis"
             }
-            document.getElementById("handzuimg").style.display = "block"
+            document.getElementById("handzuimg").style.visibility = ""
         }else{
             if(colom == "betekenis"){
                 DisplayLinks.veld1 = "romaji_uitspraak"
