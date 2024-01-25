@@ -31,7 +31,6 @@
     const sendNew = function(){
         let naam = document.getElementById("txtnaam").value
         if(naam != ""){
-            let chsum = generateCHS(naam);
             let url = serverAddress+apiAdditions+"addGroup/"+naam
             var http = new XMLHttpRequest();
             http.open('POST', url, false);

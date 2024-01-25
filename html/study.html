@@ -17,15 +17,15 @@
     </form>
     <form action="console.log('L')" name="ioform">
         <h1>Opvraging:</h1>
-        <textarea name="veld1" readonly hidden></textarea>
-        <textarea name="veld2" readonly hidden></textarea>
-        <img src="" alt="" id="handzuimg" hidden>
-        <p id="Oploss" style="margin: 0px;"></p>
-        <textarea name="Oploss" readonly hidden></textarea>
-        <input type="button" onclick="ToonOploss()" name="btnOploss" value="Toon oplossing"><br>
-        <input type="button" onclick="rate('goed')" name="goodrate" class="btnRate" disabled value="Goed">
-        <input type="button" onclick="rate('fout')" name="badrate" class="btnRate" disabled value="Fout"><br>
-        <input type="button" onclick="displayNextQuestion()" name="btnNext" value="Volgende Vraag"><br>
+        <textarea name="veld1" id="veld1" readonly></textarea>
+        <textarea name="veld2" id="veld2" readonly></textarea>
+        <img src="" alt="" id="handzuimg">
+        <p style="margin: 0px;"></p>
+        <textarea id="Oploss" name="Oploss" readonly></textarea>
+        <input type="button" onclick="ToonOploss()" name="btnOploss" id="btnOploss" value="Toon oplossing" disabled><br>
+        <input type="button" onclick="rate('goed')" name="goodrate" id="goodrate" class="btnRate" disabled value="Goed">
+        <input type="button" onclick="rate('fout')" name="badrate" id="badrate" class="btnRate" disabled value="Fout"><br>
+        <input type="button" onclick="displayNextQuestion()" name="btnNext" id="btnNext" value="Volgende Vraag"><br>
     </form>
     <table id="tabel" style="display: none;">
         <tr>
@@ -73,10 +73,9 @@
     }
     const displayNextQuestion = function() {
         if(queueReady == 0){
-            GetData(serverAddress+apiAdditions+"generate50/"+groepid+"/"+tabel+"/"+colom,async function(ret){
+            GetData(serverAddress+apiAdditions+"generate100/"+groepid+"/"+tabel+"/"+colom,function(ret){
                 if(ret.error == 401){
-                    await getMeta()
-                    displayNextQuestion()
+                    getMeta(displayNextQuestion())
                     return;
                 }
                 queueReady = ret.lengte
@@ -149,15 +148,10 @@
         }
     }
     const rate = function(reslt){
-        let foutwaarde = currentData["foutwaarde_naar_"+colom]
-        foutwaarde = foutwaarde >> 2;
-        if(reslt == "fout"){
-            foutwaarde += 128
-        }
         var http = new XMLHttpRequest();
-        var url = serverAddress+apiAdditions+"returnResult/"+currentData["id"+tabel]+"/"+tabel+"/"+colom+"/"+foutwaarde;
+        var url = serverAddress+apiAdditions+"returnResult/"+currentData["id"+tabel]+"/"+tabel+"/"+colom+"/"+reslt;
         http.open('PUT', url, true);
-        http.setRequestHeader("authorization",cryptograaf(currentData["id"+tabel]+tabel+colom+foutwaarde, false))
+        http.setRequestHeader("authorization",cryptograaf(currentData["id"+tabel]+tabel+colom+reslt, false))
         http.send();
     }
 </script>

@@ -59,7 +59,7 @@ app.get("/backend/getQuestion", (req, res) => {
   arrayindex++
 })
 app.put("/backend/returnResult/:id/:db/:mode/:fout", (req, res) => { //#
-  if(auth.Validate(req,res,req.headers.authorization,req.params.id + req.params.db + req.params.mode + req.params.fwaarde)){
+  if(auth.Validate(req,res,req.headers.authorization,req.params.id + req.params.db + req.params.mode + req.params.fout)){
     databasehelper.QuestionReturn(req, res, req.params.id,req.params.db,req.params.mode,req.params.fout)
   }
 })

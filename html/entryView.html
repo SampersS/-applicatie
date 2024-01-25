@@ -82,7 +82,10 @@
             let cel4 = newrow.insertCell();
             let cel5 = newrow.insertCell();
             let cel6 = newrow.insertCell();
-            let cel7 = newrow.insertCell();
+            let cel7
+            if(element.value == "charakter_tabel"){
+                cel7 = newrow.insertCell();
+            }
             let cel8 = newrow.insertCell();
             let id_nr
             if(element.value == "charakter_tabel"){
@@ -107,10 +110,11 @@
                 cel2.appendChild(gr)
                 let uv = document.createTextNode(data[index]["romaji_uitspraak"]);
                 cel3.appendChild(uv)
-                let kj = document.createTextNode(data[index].kanji);
-                cel4.appendChild(kj)
                 let bet = document.createTextNode(data[index].betekenis);
-                cel5.appendChild(bet)
+                cel4.appendChild(bet)
+                let kj = document.createTextNode(data[index].kanji);
+                cel5.appendChild(kj)
+
             }
             let nt = document.createTextNode(data[index].notitie);
             cel7.appendChild(nt)

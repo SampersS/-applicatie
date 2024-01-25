@@ -19,11 +19,15 @@ function generateCHS(input){
     console.log("calculated chs:", chsum)
     return chsum;
 }
-function getMeta(){
+function getMeta(cb){
     GetData(serverAddress+apiAdditions+"KeyRandom",function(data){
         modulo = data["modulo"];
         random = data["rand"]
         rsa.setPublic(modulo,"10001")
+        //console.log(rsa)
+        if(cb!=undefined){
+            cb()
+        }
     })
 }
 const GetData = function(url, callback, auth){
