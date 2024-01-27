@@ -57,7 +57,7 @@ const QuestionReturn = (req, res,id,tabel,mode,fout) => {
         const ca = "opvraag_index_naar_"+mode
         const cb = "aantal_fout_naar_"+mode
         const cc = "juist_streak_naar_"+mode
-        const select = "select *,(select MAX(??) from ??) AS max_index,(select MIN(??) from ?? where ?? >0) as min_index,(select MIN(??) from ?? where ?? !=-1) as yokuTobasu from ?? where ??=?"
+        const select = "select *, groep_id as gid,(select MAX(??) from ?? where groep_id=gid) AS max_index,(select MIN(??) from ?? where ?? >0 and groep_id=gid) as min_index,(select MIN(??) from ?? where ?? !=-1 and groep_id=gid) as yokuTobasu from ?? where ??=?"
         connection.query(select, [ca,tabel,ca,tabel,ca,ca,tabel,ca,tabel,"id"+tabel, id], (err, data) => {
             let selected;
             let extraSQL = ""
@@ -74,7 +74,7 @@ const QuestionReturn = (req, res,id,tabel,mode,fout) => {
                     if(selected[cb]==0 || selected[cc]>0){
                         //complex vanaf hier
                         //nieuwe index selecteren
-                        if(select.min_index == null){selected.min_index = 0}
+                        if(selected.min_index == null){selected.min_index = 0}
                         selected[ca] = Math.floor(Math.exp(-selected[cb]*0.5) * (selected.max_index-selected.min_index)+selected.min_index)+1
                         selected[cc] = 0
                         selected[cb] = 0
@@ -105,7 +105,7 @@ const QuestionReturn = (req, res,id,tabel,mode,fout) => {
 const PostWoord = (req, res,groepid,uitspraak,kanji,betekenis,notitie) => {
     configConnect(function(connection){
         let sql_cunt_2 = "Select (select count(*) from woordenschat_tabel where groep_id=? and opvraag_index_naar_uitspraak=-1) as nr1,(select count(*) from woordenschat_tabel where groep_id=? and opvraag_index_naar_betekenis=-1) as nr2"
-        connection.query(sql_cunt_2,[groep_id,groep_id], (err, data) => {
+        connection.query(sql_cunt_2,[groepid,groepid], (err, data) => {
             if(err){
                 console.log(err)
                 res.send("server crasht door jou!")
@@ -114,10 +114,10 @@ const PostWoord = (req, res,groepid,uitspraak,kanji,betekenis,notitie) => {
             }else{
                 console.log(data)
                 queryry = "insert into woordenschat_tabel values(null, ?,?,?,?,?,?,?,0,0,0,0)"
-                connection.query(queryry,[groepid, uitspraak, kanji, betekenis, notitie, data.nr1<100?-1:0,data.nr2<100?-1:0], (err, data) => {
+                connection.query(queryry,[groepid, uitspraak, kanji, betekenis, notitie, data[0].nr1<100?-1:0,data[0].nr2<100?-1:0], (err, data) => {
                     if(err){
                         res.status(500).send({error:'jou schuld'})
-                        console.log("er was een error")
+                        console.log(err)
                     }else{
                         //console.log('the query answer is: ', data);
                         res.status(200).send("ok");
