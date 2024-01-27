@@ -78,9 +78,9 @@ const QuestionReturn = (req, res,id,tabel,mode,fout) => {
                         selected[ca] = Math.floor(Math.exp(-selected[cb]*0.5) * (selected.max_index-selected.min_index)+selected.min_index)+1
                         selected[cc] = 0
                         selected[cb] = 0
-                        extraSQL = "update ?? set ??=-1 where ?? = ? limit 1"
+                        extraSQL = "update ?? set ??=-1 where ?? = ? and groep_id = ? limit 1"
                         if(selected.yokuTobasu == null){selected.yokuTobasu=0}
-                        extraParameters = [tabel,ca,ca, selected.yokuTobasu]
+                        extraParameters = [tabel,ca,ca, selected.yokuTobasu, selected.groep_id]
                     }else{
                         selected[cc]++
                     }
