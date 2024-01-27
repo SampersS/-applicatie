@@ -81,11 +81,11 @@
             let cel3 = newrow.insertCell();
             let cel4 = newrow.insertCell();
             let cel5 = newrow.insertCell();
-            let cel6 = newrow.insertCell();
-            let cel7
+            let cel6
             if(element.value == "charakter_tabel"){
-                cel7 = newrow.insertCell();
+                cel6 = newrow.insertCell();
             }
+            let cel7 = newrow.insertCell();
             let cel8 = newrow.insertCell();
             let id_nr
             if(element.value == "charakter_tabel"){
@@ -102,6 +102,7 @@
                 cel5.appendChild(ch)
                 let im = document.createTextNode(data[index].img);
                 cel6.appendChild(im)
+
             }else{
                 id_nr = data[index].idwoordenschat_tabel
                 id = document.createTextNode(data[index].idwoordenschat_tabel);

@@ -1,6 +1,6 @@
 var modulo = 0
 var random = 0
-const serverAddress = "http://127.0.0.1"
+const serverAddress = "http://178.117.121.6"
 const apiAdditions = ":3000/backend/"
 const apiIMGAdditions = ":3000/backendIMG/"
 function decimalToHex(d, padding) {

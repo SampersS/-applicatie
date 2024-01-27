@@ -57,8 +57,8 @@ const QuestionReturn = (req, res,id,tabel,mode,fout) => {
         const ca = "opvraag_index_naar_"+mode
         const cb = "aantal_fout_naar_"+mode
         const cc = "juist_streak_naar_"+mode
-        const select = "select *, MAX(??) AS max_index ,(select MIN(??) from ?? where ?? >0) as min_index,(select MIN(??) from ?? where ?? !=-1) as yokuTobasu from ?? where ??=?"
-        connection.query(select, [ca,ca,tabel,ca,ca,tabel,ca,tabel,"id"+tabel, id], (err, data) => {
+        const select = "select *,(select MAX(??) from ??) AS max_index,(select MIN(??) from ?? where ?? >0) as min_index,(select MIN(??) from ?? where ?? !=-1) as yokuTobasu from ?? where ??=?"
+        connection.query(select, [ca,tabel,ca,tabel,ca,ca,tabel,ca,tabel,"id"+tabel, id], (err, data) => {
             let selected;
             let extraSQL = ""
             let extraParameters = []
@@ -74,6 +74,7 @@ const QuestionReturn = (req, res,id,tabel,mode,fout) => {
                     if(selected[cb]==0 || selected[cc]>0){
                         //complex vanaf hier
                         //nieuwe index selecteren
+                        if(select.min_index == null){selected.min_index = 0}
                         selected[ca] = Math.floor(Math.exp(-selected[cb]*0.5) * (selected.max_index-selected.min_index)+selected.min_index)+1
                         selected[cc] = 0
                         selected[cb] = 0

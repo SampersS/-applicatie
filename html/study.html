@@ -149,6 +149,10 @@
     }
     const rate = function(reslt){
         var http = new XMLHttpRequest();
+        let rij = document.getElementsByClassName("btnRate")
+        for(let i = 0; i < rij.length; i++){
+            rij[i].disabled = true
+        }
         var url = serverAddress+apiAdditions+"returnResult/"+currentData["id"+tabel]+"/"+tabel+"/"+colom+"/"+reslt;
         http.open('PUT', url, true);
         http.setRequestHeader("authorization",cryptograaf(currentData["id"+tabel]+tabel+colom+reslt, false))

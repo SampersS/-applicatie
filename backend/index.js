@@ -8,7 +8,6 @@ const auth = require("./autenticatie.js")
 
 var Opvragingen
 var VraagendIP
-var arrayindex = 0;
 global.__dirname = process.cwd();
 
 const app = express()
@@ -29,12 +28,11 @@ app.get("/backend/generate100/:groupid/:kanjidb/:mode", (req, res) => { //#
     databasehelper.ServerGenerate100Questions(req, res, req.params["groupid"], req.params["kanjidb"], req.params["mode"], function(data){
       Opvragingen = data
       VraagendIP = auth.getIP(req);
-      arrayindex = 0
     })
   }
 })
 app.get("/backend/getQuestion", (req, res) => {
-  if(Opvragingen == [] || arrayindex == Opvragingen.length){
+  if(Opvragingen == []){
     res.set({
       "CacheControl":"no-cache",
       "Pragma":"no-cache",
@@ -51,12 +49,13 @@ app.get("/backend/getQuestion", (req, res) => {
     }).send("error: ander apparaat opvraging")
     return;
   }
+  let random = Math.floor(Math.random() * Opvragingen.length)
   res.set({
     "CacheControl":"no-cache",
     "Pragma":"no-cache",
     "Expires":"-1"
-  }).send(Opvragingen[arrayindex])
-  arrayindex++
+  }).send(Opvragingen[random])
+  Opvragingen.splice(random,1)
 })
 app.put("/backend/returnResult/:id/:db/:mode/:fout", (req, res) => { //#
   if(auth.Validate(req,res,req.headers.authorization,req.params.id + req.params.db + req.params.mode + req.params.fout)){
