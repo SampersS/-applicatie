@@ -75,7 +75,7 @@
         if(queueReady == 0){
             GetData(serverAddress+apiAdditions+"generate100/"+groepid+"/"+tabel+"/"+colom,function(ret){
                 if(ret.error == 401){
-                    getMeta(displayNextQuestion())
+                    getMeta(displayNextQuestion)
                     return;
                 }
                 queueReady = ret.lengte
@@ -89,8 +89,8 @@
         }
     }
     const DisplayData = function(data){
-        if(data.toString().substring(0,5)=="error"){
-            console.error(data)
+        if(data.error != undefined){
+            console.error(data.error)
             queueReady = 0;
             displayNextQuestion();
             return;

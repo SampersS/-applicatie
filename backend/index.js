@@ -37,7 +37,7 @@ app.get("/backend/getQuestion", (req, res) => {
       "CacheControl":"no-cache",
       "Pragma":"no-cache",
       "Expires":"-1"
-    }).send("error: geen vragen gegenereerd")
+    }).json({error: "geen vragen gegenereerd"})
     console.log(Opvragingen)
     return;
   }
@@ -46,7 +46,7 @@ app.get("/backend/getQuestion", (req, res) => {
       "CacheControl":"no-cache",
       "Pragma":"no-cache",
       "Expires":"-1"
-    }).send("error: ander apparaat opvraging")
+    }).json({error: "ander apparaat opvraging"})
     return;
   }
   let random = Math.floor(Math.random() * Opvragingen.length)

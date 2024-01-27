@@ -104,44 +104,55 @@ const QuestionReturn = (req, res,id,tabel,mode,fout) => {
 
 const PostWoord = (req, res,groepid,uitspraak,kanji,betekenis,notitie) => {
     configConnect(function(connection){
-        let queryry = ""
-        if(aantalWoorden < 100){
-            queryry = "insert into woordenschat_tabel values(null, ?,?,?,?,0,0,0,0,0,0,?)"
-        }else{
-            queryry = "insert into woordenschat_tabel values(null, ?,?,?,?,-1,-1,0,0,0,0,?)"
-        }
-        connection.query(queryry,[groepid, uitspraak, kanji, betekenis, notitie], (err, data) => {
+        let sql_cunt_2 = "Select (select count(*) from woordenschat_tabel where groep_id=? and opvraag_index_naar_uitspraak=-1) as nr1,(select count(*) from woordenschat_tabel where groep_id=? and opvraag_index_naar_betekenis=-1) as nr2"
+        connection.query(sql_cunt_2,[groep_id,groep_id], (err, data) => {
             if(err){
-                res.status(404).send({error:'sou da warui no jibun janai'})
-                console.log("er was een error")
+                console.log(err)
+                res.send("server crasht door jou!")
+                connection.end()
+                return
             }else{
-                //console.log('the query answer is: ', data);
-                res.status(200).send("ok");
-                aantalWoorden++;
+                console.log(data)
+                queryry = "insert into woordenschat_tabel values(null, ?,?,?,?,?,?,?,0,0,0,0)"
+                connection.query(queryry,[groepid, uitspraak, kanji, betekenis, notitie, data.nr1<100?-1:0,data.nr2<100?-1:0], (err, data) => {
+                    if(err){
+                        res.status(500).send({error:'jou schuld'})
+                        console.log("er was een error")
+                    }else{
+                        //console.log('the query answer is: ', data);
+                        res.status(200).send("ok");
+                    }
+                });
+                connection.end()
             }
         });
-        connection.end()
     })
 }
 const PostKanji = (req, res,groep_id,uitspraakvb, betekenis,chara,img,notitie) => {
     configConnect(function(connection){
-        let queryry = ""
-        if(aantalWoorden < 100){
-            queryry = "insert into charakter_tabel values(null, ?,?,?,?,?,0,0,0,0,0,0,?)"
-        }else{
-            queryry = "insert into charakter_tabel values(null, ?,?,?,?,?,-1,-1,0,0,0,0,?)"
-        }
-        console.log(queryry)
-        connection.query(queryry,[groep_id, uitspraakvb, betekenis, chara, img, notitie], (err, data) => {
+        let sql_cunt_2 = "Select (select count(*) from charakter_tabel where groep_id=? and opvraag_index_naar_teken=-1) as nr1,(select count(*) from charakter_tabel where groep_id=? and opvraag_index_naar_betekenis=-1) as nr2"
+        connection.query(sql_cunt_2,[groep_id,groep_id], (err, data) => {
+            console.log(data)
             if(err){
-                res.status(404).send({error:'sou da warui no jibun janai'})
-                console.log("er was een error")
+                console.log(err)
+                res.send("server crasht door jou!")
+                connection.end()
+                return
             }else{
-                //console.log('the query answer is: ', data);
-                res.status(200).send("ok");
+                let queryry = "insert into charakter_tabel values(null, ?,?,?,?,?,?,?,?,0,0,0,0)"
+                connection.query(queryry,[groep_id, uitspraakvb, betekenis, chara, img,notitie, data[0].nr1>=100?0:-1,data[0].nr2>=100?0:-1], (err, data) => {
+                    if(err){
+                        res.status(500).send({error:'jou schuld'})
+                        console.log(err)
+                    }else{
+                        //console.log('the query answer is: ', data);
+                        res.status(200).send("ok");
+                    }
+                });
+                connection.end()
             }
         });
-        connection.end()
+        
     })
 }
 const RemoveWord = (req, res, id) => {
@@ -277,16 +288,3 @@ const GetSameVocab = (req, res, uitspraak) => {
     })
 }
 module.exports = {ServerGenerate100Questions, QuestionReturn,PostWoord, PostKanji, GetGroups, AddGroup, DeleteGroup, RemoveKanji, RemoveWord, GetAllEntries, GetSameVocab}
-
-//huidig aantal woorden/kanji achterhalen
-configConnect(function(connection){
-    const queryry = "SELECT count(idwoordenschat_tabel) as cunt1 FROM woordenschat_tabel; Select count(idcharakter_tabel) as cunt2 from charakter_tabel"
-    connection.query(queryry, (err, data) => {
-    if(err){
-        console.log(err)
-    }else{
-        aantalWoorden = data[0].cunt1
-        aantalKanji = data[1].cunt2
-    }
-    connection.end()
-});})
