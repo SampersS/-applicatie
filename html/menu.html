@@ -1,24 +1,67 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
     <meta charset="UTF-8">
     <title>Main</title>
     <script src="./lib/tools.js"></script>
+    <script>
+        const nextModeEnable = function(){
+            var richtingelement = document.getElementById("richtingmode");
+            while (richtingelement.options.length > 0) {                
+                richtingelement.remove(0);
+            }
+            richtingelement.disabled= true;
+            var groepElement = document.getElementById("groepen");
+            while (groepElement.options.length > 0) {
+                groepElement.remove(0);
+            }
+            document.getElementById("studiebtn").disabled = true;
+            groepElement.disabled = true;
+            var selecvalu = document.getElementById("Kanjimode").value;
+            if(selecvalu != ""){
+                richtingelement.disabled= false;
+                document.getElementById("studiebtn").disabled = false;
+                groepElement.disabled = false;
+                option = new Option("betekenis", "betekenis");
+                richtingelement.add( option );
+                if(selecvalu == "charakter_tabel"){
+                    option = new Option("teken", "teken");
+                    richtingelement.add( option );
+    
+                }else{
+                    option = new Option("uitspraak", "uitspraak");
+                    richtingelement.add( option );
+                }
+                var string = serverAddress+apiAdditions+"getGroups"
+                GetData(string, function(data){
+                    for (var index = 0; index < data.length; index++) {
+                        option = new Option(data[index].naam, data[index].idgroep_namen);
+                        groepElement.add( option );
+                        console.log(data[index])
+                    }
+                })
+            }
+        }
+        const DirectStudy = function(){
+            var url = "study.html?"+document.getElementById("Kanjimode").value+"?"+document.getElementById("richtingmode").value+"?"+document.getElementById("groepen").value
+            window.location.href = url;
+        }
+    </script>
 </head>
 <body onload="PreparePassword()">
     <div id="menu">
         <div id="modeselecting">
             <p style="margin: 0px;">Selecteer je mode</p>
-            <select name="Kanjimode" id="Kanjimode" onchange="nextModeEnable()">
+            <select id="Kanjimode" onchange="nextModeEnable()">
                 <option value=""></option>
                 <option value="charakter_tabel">Kanji</option>
                 <option value="woordenschat_tabel">Woordenschat</option>
             </select><br>
             <p style="margin: 0px;">welke kolom opvragen?</p>
-            <select name="richtingmode" id="richtingmode" disabled></select><br>
+            <select id="richtingmode" disabled></select><br>
             <p style="margin: 0px;">welke groep?</p>
-            <select name="groepen" id="groepen" disabled></select><br>
-            <button type="button" onclick="DirectStudy()" id="studiebtn" disabled>start Studie</button>
+            <select id="groepen" disabled></select><br>
+            <button onclick="DirectStudy()" id="studiebtn" disabled>start Studie</button>
         </div>
         <p>Andere opties:</p>
         <ul>
@@ -30,47 +73,4 @@
     </div>
     
 </body>
-<script>
-    const nextModeEnable = function(){
-        let richtingelement = document.getElementById("richtingmode");
-        while (richtingelement.options.length > 0) {                
-            richtingelement.remove(0);
-        }
-        richtingelement.disabled= true;
-        let groepElement = document.getElementById("groepen");
-        while (groepElement.options.length > 0) {
-            groepElement.remove(0);
-        }
-        document.getElementById("studiebtn").disabled = true;
-        groepElement.disabled = true;
-        let selecvalu = document.getElementById("Kanjimode").value;
-        if(selecvalu != ""){
-            richtingelement.disabled= false;
-            document.getElementById("studiebtn").disabled = false;
-            groepElement.disabled = false;
-            option = new Option("betekenis", "betekenis");
-            richtingelement.add( option );
-            if(selecvalu == "charakter_tabel"){
-                option = new Option("teken", "teken");
-                richtingelement.add( option );
-
-            }else{
-                option = new Option("uitspraak", "uitspraak");
-                richtingelement.add( option );
-            }
-            let string = serverAddress+apiAdditions+"getGroups"
-            GetData(string, function(data){
-                for (let index = 0; index < data.length; index++) {
-                    option = new Option(data[index].naam, data[index].idgroep_namen);
-                    groepElement.add( option );
-                    console.log(data[index])
-                }
-            })
-        }
-    }
-    const DirectStudy = function(){
-        let url = "study.html?"+document.getElementById("Kanjimode").value+"?"+document.getElementById("richtingmode").value+"?"+document.getElementById("groepen").value
-        window.location.href = url;
-    }
-</script>
 </html>

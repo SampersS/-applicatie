@@ -5,6 +5,7 @@ const util = require("util")
 const fileHelper = require("./fileHelper.js")
 const cors = require("cors")
 const auth = require("./autenticatie.js")
+const routines = require("./routines.js")
 
 var Opvragingen
 var VraagendIP
@@ -23,8 +24,8 @@ app.get('/backend/', (req, res) => {
   }).send('Verbinding met de backend is werkend!')
   console.log("gotten")
 })
-app.get("/backend/generate100/:groupid/:kanjidb/:mode", (req, res) => { //#
-  if(auth.Validate(req,res,req.headers.authorization,req.params.groupid + req.params.kanjidb + req.params.mode)){
+app.get("/backend/generate100/:groupid/:kanjidb/:mode/*", (req, res) => { //#
+  if(auth.Validate(req,res,routines.extracUrlPart(req.originalUrl,6),req.params.groupid + req.params.kanjidb + req.params.mode)){
     databasehelper.ServerGenerate100Questions(req, res, req.params["groupid"], req.params["kanjidb"], req.params["mode"], function(data){
       Opvragingen = data
       VraagendIP = auth.getIP(req);
@@ -57,8 +58,8 @@ app.get("/backend/getQuestion", (req, res) => {
   }).send(Opvragingen[random])
   Opvragingen.splice(random,1)
 })
-app.put("/backend/returnResult/:id/:db/:mode/:fout", (req, res) => { //#
-  if(auth.Validate(req,res,req.headers.authorization,req.params.id + req.params.db + req.params.mode + req.params.fout)){
+app.put("/backend/returnResult/:id/:db/:mode/:fout/*", (req, res) => { //#
+  if(auth.Validate(req,res,routines.extracUrlPart(req.originalUrl,7),req.params.id + req.params.db + req.params.mode + req.params.fout)){
     databasehelper.QuestionReturn(req, res, req.params.id,req.params.db,req.params.mode,req.params.fout)
   }
 })

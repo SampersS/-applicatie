@@ -9,154 +9,155 @@
     <script src="./lib/rsa.js"></script>
     <script src="./lib/base64.js"></script>
     <script src="./lib/tools.js"></script>
+    <script>
+        var tabel = ""
+        var groepid = ""
+        var colom = ""
+        var queueReady = 0
+        var DisplayLinks = {}
+        var OplossingLinks = {}
+        var currentData = {}
+        function prepare() {
+            var urldata = window.location.search.split("?")
+            console.log(urldata[1])
+            tabel = urldata[1];
+            colom = urldata[2];
+            groepid = urldata[3];
+            if(tabel == "charakter_tabel"){
+                if(colom == "teken"){
+                    DisplayLinks.veld1 = "uitspraak voorbeeld"
+                    DisplayLinks.veld2 = "betekenis"
+                    OplossingLinks.handzuimg = "img"
+                    document.getElementById("Oplos").hidden = true
+                    document.getElementById("veld2").hidden = false
+                }else{
+                    DisplayLinks.veld1 = "uitspraak voorbeeld"
+                    DisplayLinks.handzuimg = "img"
+                    OplossingLinks.Oploss = "betekenis"
+                }
+                document.getElementById("handzuimg").hidden = false;
+            }else{
+                if(colom == "betekenis"){
+                    DisplayLinks.veld1 = "romaji_uitspraak"
+                    OplossingLinks.Oploss = "betekenis"
+                }else{
+                    DisplayLinks.veld1 = "kanji"
+                    DisplayLinks.veld2 = "betekenis"
+                    OplossingLinks.Oploss = "romaji_uitspraak"
+                    document.getElementById("veld2").hidden = false
+                }
+            }
+            PreparePassword()
+            getMeta()
+        }
+        const displayNextQuestion = function() {
+            if(queueReady == 0){
+                GetData(serverAddress+apiAdditions+"generate100/"+groepid+"/"+tabel+"/"+colom,function(ret){
+                    if(ret.error == 401){
+                        getMeta(displayNextQuestion)
+                        return;
+                    }
+                    queueReady = ret.lengte
+                    if(queueReady==0){
+                        return
+                    }
+                    GetData(serverAddress+apiAdditions+"getQuestion", DisplayData)
+                },cryptograaf(groepid+tabel+colom, false))
+            }else{
+                GetData(serverAddress+apiAdditions+"getQuestion", DisplayData)  
+            }
+        }
+        const DisplayData = function(data){
+            if(data.error != undefined){
+                console.error(data.error)
+                queueReady = 0;
+                displayNextQuestion();
+                return;
+            }
+            document.getElementById("tabel").hidden = true
+            document.getElementById("veld1").value = data[DisplayLinks.veld1];
+            if(DisplayLinks.veld2 != undefined){
+                document.getElementById("veld2").value = data[DisplayLinks.veld2];
+            }
+            if(DisplayLinks.handzuimg != undefined){
+                //console.log(decodeURI(data[DisplayLinks.handzuimg]))
+                document.getElementById("handzuimg").src = serverAddress + apiIMGAdditions + data[DisplayLinks.handzuimg];
+            }else{
+                document.getElementById("handzuimg").src = ""
+            }
+            document.getElementById("Oploss").textContent = ""
+            queueReady--
+            document.getElementById("btnNext").disabled = true;
+            document.getElementById("btnOploss").disabled = false
+            var rij = document.getElementsByClassName("btnRate")
+            for(var i = 0; i < rij.length; i++){
+                rij[i].disabled = true
+            }
+            currentData = data
+        }
+        const ToonOploss = function(){
+            if(OplossingLinks.handzuimg != undefined){
+                document.getElementById("handzuimg").src = serverAddress + apiIMGAdditions + currentData[OplossingLinks.handzuimg];
+            }
+            if(OplossingLinks.Oploss != undefined){
+                document.getElementById("Oploss").textContent = currentData[OplossingLinks.Oploss];
+            }
+            var rij = document.getElementsByClassName("btnRate")
+            for(var i = 0; i < rij.length; i++){
+                rij[i].disabled = false
+            }
+            document.getElementById("btnOploss").disabled = true
+            document.getElementById("btnNext").disabled = false
+            if(tabel == "woordenschat_tabel" && colom == "betekenis"){
+                GetData(serverAddress+apiAdditions+"zelfdeUitspraak/"+currentData.romaji_uitspraak,function(data){
+                    if(data.length> 1){
+                        var tabelElement = document.getElementById("tabel")
+                        tabelElement.hidden = false
+                        var rowCount = tabelElement.rows.length;
+                        for (var i = 1; i < rowCount; i++) {
+                            tabelElement.deleteRow(1);
+                        }
+                        for(var index = 0; index < data.length; index++){
+                            var newrow = tabelElement.insertRow()
+                            var cel1 = newrow.insertCell();
+                            cel1.appendChild(document.createTextNode(data[index].betekenis))
+                        }
+                    }
+                })
+            }
+        }
+        const rate = function(reslt){
+            var http = new XMLHttpRequest();
+            var rij = document.getElementsByClassName("btnRate")
+            for(var i = 0; i < rij.length; i++){
+                rij[i].disabled = true
+            }
+            var url = serverAddress+apiAdditions+"returnResult/"+currentData["id"+tabel]+"/"+tabel+"/"+colom+"/"+reslt;
+            http.open('PUT', url+"/"+cryptograaf(currentData["id"+tabel]+tabel+colom+reslt, false), true);
+            http.send();
+        }
+    </script>
 </head>
 <body onload="prepare()">
-    <form action="console.log('drugs zak')" name="pwobj" hidden>
+    <div id="pwobj" hidden>
         <label for="txtPassword">Wachtwoord:</label><br>
         <input type="password" id="txtPassword"><br>
-    </form>
+    </div>
     <form action="console.log('L')" name="ioform">
         <h1>Opvraging:</h1>
-        <textarea name="veld1" id="veld1" readonly></textarea>
-        <textarea name="veld2" id="veld2" readonly></textarea>
-        <img src="" alt="" id="handzuimg">
-        <p style="margin: 0px;"></p>
-        <textarea id="Oploss" name="Oploss" readonly></textarea>
-        <input type="button" onclick="ToonOploss()" name="btnOploss" id="btnOploss" value="Toon oplossing" disabled><br>
-        <input type="button" onclick="rate('goed')" name="goodrate" id="goodrate" class="btnRate" disabled value="Goed">
-        <input type="button" onclick="rate('fout')" name="badrate" id="badrate" class="btnRate" disabled value="Fout"><br>
-        <input type="button" onclick="displayNextQuestion()" name="btnNext" id="btnNext" value="Volgende Vraag"><br>
+        <textarea  id="veld1" readonly></textarea><br>
+        <textarea id="veld2" readonly hidden></textarea><br>
+        <img src="" alt="" id="handzuimg" hidden><br>
+        <textarea id="Oploss" readonly></textarea><br>
+        <input type="button" onclick="ToonOploss()" id="btnOploss" value="Toon oplossing" disabled><br>
+        <input type="button" onclick="rate('goed')" id="goodrate" class="btnRate" disabled value="Goed">
+        <input type="button" onclick="rate('fout')" id="badrate" class="btnRate" disabled value="Fout"><br>
+        <input type="button" onclick="displayNextQuestion()" id="btnNext" value="Volgende Vraag"><br>
     </form>
-    <table id="tabel" style="display: none;">
+    <table id="tabel" hidden>
         <tr>
             <th>Andere betekenissen:</th>
         </tr>
     </table>
 </body>
-<script>
-    var tabel = ""
-    var groepid = ""
-    var colom = ""
-    var queueReady = 0
-    var DisplayLinks = {}
-    var OplossingLinks = {}
-    var currentData = {}
-    function prepare() {
-        let urldata = window.location.search.split("?")
-        console.log(urldata)
-        tabel = urldata[1];
-        colom = urldata[2];
-        groepid = urldata[3];
-        if(tabel == "charakter_tabel"){
-            if(colom == "teken"){
-                DisplayLinks.veld1 = "uitspraak voorbeeld"
-                DisplayLinks.veld2 = "betekenis"
-                OplossingLinks.handzuimg = "img"
-            }else{
-                DisplayLinks.veld1 = "uitspraak voorbeeld"
-                DisplayLinks.handzuimg = "img"
-                OplossingLinks.Oploss = "betekenis"
-            }
-            document.getElementById("handzuimg").style.visibility = ""
-        }else{
-            if(colom == "betekenis"){
-                DisplayLinks.veld1 = "romaji_uitspraak"
-                OplossingLinks.Oploss = "betekenis"
-            }else{
-                DisplayLinks.veld1 = "kanji"
-                DisplayLinks.veld2 = "betekenis"
-                OplossingLinks.Oploss = "romaji_uitspraak"
-            }
-        }
-        PreparePassword()
-        getMeta()
-    }
-    const displayNextQuestion = function() {
-        if(queueReady == 0){
-            GetData(serverAddress+apiAdditions+"generate100/"+groepid+"/"+tabel+"/"+colom,function(ret){
-                if(ret.error == 401){
-                    getMeta(displayNextQuestion)
-                    return;
-                }
-                queueReady = ret.lengte
-                if(queueReady==0){
-                    return
-                }
-                GetData(serverAddress+apiAdditions+"getQuestion", DisplayData)
-            },cryptograaf(groepid+tabel+colom, false))
-        }else{
-            GetData(serverAddress+apiAdditions+"getQuestion", DisplayData)  
-        }
-    }
-    const DisplayData = function(data){
-        if(data.error != undefined){
-            console.error(data.error)
-            queueReady = 0;
-            displayNextQuestion();
-            return;
-        }
-        document.getElementById("tabel").style.display = "none"
-        document.getElementById("veld1").textContent = data[DisplayLinks.veld1];
-        if(DisplayLinks.veld2 != undefined){
-            document.getElementById("veld2").textContent = data[DisplayLinks.veld2];
-        }
-        if(DisplayLinks.handzuimg != undefined){
-            console.log(decodeURI(data[DisplayLinks.handzuimg]))
-            document.getElementById("handzuimg").src = serverAddress + apiIMGAdditions + decodeURI(data[DisplayLinks.handzuimg]);
-        }else{
-            document.getElementById("handzuimg").src = ""
-        }
-        document.getElementById("Oploss").textContent = ""
-        queueReady--
-        document.getElementById("btnNext").disabled = true;
-        document.getElementById("btnOploss").disabled = false
-        let rij = document.getElementsByClassName("btnRate")
-        for(let i = 0; i < rij.length; i++){
-            rij[i].disabled = true
-        }
-        currentData = data
-    }
-    const ToonOploss = function(){
-        if(OplossingLinks.handzuimg != undefined){
-            document.getElementById("handzuimg").src = serverAddress + apiIMGAdditions + currentData[OplossingLinks.handzuimg];
-        }
-        if(OplossingLinks.Oploss != undefined){
-            document.getElementById("Oploss").textContent = currentData[OplossingLinks.Oploss];
-        }
-        let rij = document.getElementsByClassName("btnRate")
-        for(let i = 0; i < rij.length; i++){
-            rij[i].disabled = false
-        }
-        document.getElementById("btnOploss").disabled = true
-        document.getElementById("btnNext").disabled = false
-        if(tabel == "woordenschat_tabel" && colom == "betekenis"){
-            GetData(serverAddress+apiAdditions+"zelfdeUitspraak/"+currentData.romaji_uitspraak,function(data){
-                if(data.length> 1){
-                    let tabelElement = document.getElementById("tabel")
-                    tabelElement.style.display = "block"
-                    var rowCount = tabelElement.rows.length;
-                    for (var i = 1; i < rowCount; i++) {
-                        tabelElement.deleteRow(1);
-                    }
-                    for(let index = 0; index < data.length; index++){
-                        let newrow = tabelElement.insertRow()
-                        let cel1 = newrow.insertCell();
-                        cel1.appendChild(document.createTextNode(data[index].betekenis))
-                    }
-                }
-            })
-        }
-    }
-    const rate = function(reslt){
-        var http = new XMLHttpRequest();
-        let rij = document.getElementsByClassName("btnRate")
-        for(let i = 0; i < rij.length; i++){
-            rij[i].disabled = true
-        }
-        var url = serverAddress+apiAdditions+"returnResult/"+currentData["id"+tabel]+"/"+tabel+"/"+colom+"/"+reslt;
-        http.open('PUT', url, true);
-        http.setRequestHeader("authorization",cryptograaf(currentData["id"+tabel]+tabel+colom+reslt, false))
-        http.send();
-    }
-</script>
 </html>
