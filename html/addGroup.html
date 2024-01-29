@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
     <meta charset="UTF-8">
     <title>Document</title>
@@ -34,15 +34,14 @@
             let url = serverAddress+apiAdditions+"addGroup/"+naam
             var http = new XMLHttpRequest();
             http.open('POST', url, false);
-            http.setRequestHeader("authorization",cryptograaf(naam, false))
-            http.send()
+            http.send(cryptograaf(naam, false))
         }
     }
     const prepare = function(){
         let string = serverAddress+apiAdditions+"getGroups"
         let groepElement = document.getElementById("groepen");
         PreparePassword()
-        GetData(string, function(data){
+        GetDataPost(string, function(data){
             for (let index = 0; index < data.length; index++) {
                 let tabelElement = document.getElementById("tabel")
                 let newrow = tabelElement.insertRow()

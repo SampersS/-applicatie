@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
     <meta charset="UTF-8">
     <title>add html</title>
@@ -31,7 +31,7 @@
             let string = serverAddress+apiAdditions+"getGroups"
             let groepElement = document.getElementById("groepen");
             PreparePassword()
-            GetData(string, function(data){
+            GetDataPost(string, function(data){
                 for (let index = 0; index < data.length; index++) {
                     option = new Option(data[index].naam, data[index].idgroep_namen);
                     groepElement.add( option );
@@ -70,8 +70,7 @@
                 formData.append('file', Image);
                 var http = new XMLHttpRequest();
                 var url = serverAddress+apiIMGAdditions+Image.size;
-                http.open('POST', url, false);
-                http.setRequestHeader("authorization",cryptograaf(Image.size, false))
+                http.open('POST', url+"/"+cryptograaf(Image.size, false), false);
                 http.send(formData);
             }else{
                 urlparm["ap"] = "postWoord/"
@@ -83,8 +82,7 @@
             }
             var http = new XMLHttpRequest();
             http.open('POST', serverAddress+apiAdditions+urlparm["ap"]+urlparm["pad"]);
-            http.setRequestHeader("authorization",cryptograaf(urlparm["pad"], true))
-            http.send();
+            http.send(cryptograaf(urlparm["pad"], true));
             window.location.href = "menu.html"
         }
         </script>

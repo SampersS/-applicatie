@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
     <meta charset="UTF-8">
     <title>Pagina 2</title>
@@ -52,7 +52,7 @@
         }
         const displayNextQuestion = function() {
             if(queueReady == 0){
-                GetData(serverAddress+apiAdditions+"generate100/"+groepid+"/"+tabel+"/"+colom,function(ret){
+                GetDataPost(serverAddress+apiAdditions+"generate100/"+groepid+"/"+tabel+"/"+colom,function(ret){
                     if(ret.error == 401){
                         getMeta(displayNextQuestion)
                         return;
@@ -61,10 +61,10 @@
                     if(queueReady==0){
                         return
                     }
-                    GetData(serverAddress+apiAdditions+"getQuestion", DisplayData)
+                    GetDataPost(serverAddress+apiAdditions+"getQuestion", DisplayData)
                 },cryptograaf(groepid+tabel+colom, false))
             }else{
-                GetData(serverAddress+apiAdditions+"getQuestion", DisplayData)  
+                GetDataPost(serverAddress+apiAdditions+"getQuestion", DisplayData)  
             }
         }
         const DisplayData = function(data){
@@ -109,7 +109,7 @@
             document.getElementById("btnOploss").disabled = true
             document.getElementById("btnNext").disabled = false
             if(tabel == "woordenschat_tabel" && colom == "betekenis"){
-                GetData(serverAddress+apiAdditions+"zelfdeUitspraak/"+currentData.romaji_uitspraak,function(data){
+                GetDataPost(serverAddress+apiAdditions+"zelfdeUitspraak/"+currentData.romaji_uitspraak,function(data){
                     if(data.length> 1){
                         var tabelElement = document.getElementById("tabel")
                         tabelElement.hidden = false
@@ -133,8 +133,9 @@
                 rij[i].disabled = true
             }
             var url = serverAddress+apiAdditions+"returnResult/"+currentData["id"+tabel]+"/"+tabel+"/"+colom+"/"+reslt;
-            http.open('PUT', url+"/"+cryptograaf(currentData["id"+tabel]+tabel+colom+reslt, false), true);
-            http.send();
+            http.open('PUT', url, true);
+            http.setRequestHeader("Content-Type","text/plain")
+            http.send(cryptograaf(currentData["id"+tabel]+tabel+colom+reslt, false));
         }
     </script>
 </head>

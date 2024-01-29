@@ -20,7 +20,7 @@ function generateCHS(input){
     return chsum;
 }
 function getMeta(cb){
-    GetData(serverAddress+apiAdditions+"KeyRandom",function(data){
+    GetDataPost(serverAddress+apiAdditions+"KeyRandom",function(data){
         modulo = data["modulo"];
         random = data["rand"]
         if(cb!=undefined){
@@ -28,7 +28,7 @@ function getMeta(cb){
         }
     })
 }
-const GetData = function(url, callback, auth){
+const GetDataPost = function(url, callback, auth){
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
@@ -36,12 +36,14 @@ const GetData = function(url, callback, auth){
             callback(JSON.parse(xhttp.responseText))
         }
     };
+    xhttp.open("POST", url, true);  //Get in een xmlhttprequest kan geen body hebben
     if(auth != undefined){
-        url += "/"+auth
+        console.log(auth)
+        //xhttp.setRequestHeader("Content-Type","application/json;charset=UTF-8")
+        xhttp.send(auth);
+    }else{
+        xhttp.send();
     }
-    xhttp.open("GET", url, true);
-
-    xhttp.send();
 }
 function cryptograaf(chsMateriaal, matIsUrl){
     //matIsUrl: als het checksum materiaal in 1 string zit gescheden door '/'

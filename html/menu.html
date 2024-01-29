@@ -33,7 +33,7 @@
                     richtingelement.add( option );
                 }
                 var string = serverAddress+apiAdditions+"getGroups"
-                GetData(string, function(data){
+                GetDataPost(string, function(data){
                     for (var index = 0; index < data.length; index++) {
                         option = new Option(data[index].naam, data[index].idgroep_namen);
                         groepElement.add( option );

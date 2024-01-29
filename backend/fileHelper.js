@@ -24,6 +24,9 @@ const upload = multer({
         if(ext !== '.png' && ext !== '.jpg' && ext !== '.jpeg') {
             return callback(new Error('Only images are allowed'))
         }
+        if(file.size != __size){
+            return callback(new Error("Bestand aangepast"))
+        }
         callback(null, true)
     },
     limits: { fileSize: maxSize},}
@@ -57,7 +60,7 @@ var deleteFile = (req, res) =>{
             // res.status(500).send({
             //     message: "Could not delete the file. " + err
             // })
-            console.error("kon bestand niet verwijderen.")
+            console.error("kon bestand niet verwijderen.",err)
             return
         }
     })
