@@ -24,9 +24,6 @@ const upload = multer({
         if(ext !== '.png' && ext !== '.jpg' && ext !== '.jpeg') {
             return callback(new Error('Only images are allowed'))
         }
-        if(file.size != __size){
-            return callback(new Error("Bestand aangepast"))
-        }
         callback(null, true)
     },
     limits: { fileSize: maxSize},}

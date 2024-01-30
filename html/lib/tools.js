@@ -57,7 +57,7 @@ function cryptograaf(chsMateriaal, matIsUrl){
         cumMonster = chsMateriaal
     }
     var rsa_obj = new RSAKey();
-    console.log("handige stuff:", modulo,decimalToHex(generateCHS(cumMonster),8)+decimalToHex(random,8)+getPassword())
+    //console.log("handige stuff:", modulo,decimalToHex(generateCHS(cumMonster),8)+decimalToHex(random,8)+getPassword())
     rsa_obj.setPublic(modulo,"10001")
     return hex2b64(rsa_obj.encrypt(decimalToHex(generateCHS(cumMonster),8)+decimalToHex(random++,8)+getPassword()))
 }

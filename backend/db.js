@@ -27,78 +27,126 @@ let configConnect = (returnCode) => {
     });
 }
 
-const ServerGenerate100Questions = (req, res,group,tabel,mode,callback) => {
-  configConnect(function(connection){
-        const queryry = "SELECT * FROM ?? where ?? = -1 and groep_id=?"
-        console.log(queryry)
+const ServerGenerate100Questions = (req, res,group,tabel,mode) => {
+    configConnect(function(connection){
+        var queryry;
+        if(tabel == "charakter_tabel"){
+            queryry = "SELECT idcharakter_tabel, `uitspraak voorbeeld`, betekenis , ckarakter , img, notitie FROM ?? where ?? = -1 and groep_id=?"
+        }else{
+            queryry = "SELECT idwoordenschat_tabel, romaji_uitspraak, kanji, betekenis, notitie FROM ?? where ?? = -1 and groep_id=?"
+        }
+        console.log("generator...")
         connection.query(queryry, [tabel,"opvraag_index_naar_"+mode,group], (err, data) => {
         if(err){
             res.set({
                 "CacheControl":"no-cache",
                 "Pragma":"no-cache",
                 "Expires":"-1"
-              }).status(404).send({error:'sou da warui no jibun janai'})
+              }).status(404).send({error:'error deatta'})
             console.log("er was een error")
+            return;
         }else{
-            //console.log('the query answer is: ', data);
-            res.set({
-                "CacheControl":"no-cache",
-                "Pragma":"no-cache",
-                "Expires":"-1"
-              }).status(200).send("{\"lengte\":"+data.length+"}");
+            //max 100 vragen zitten in data
+            //array shuffelen
+            let shuffeledArray = []
+            while(data.length != 0){
+                let random = Math.floor(Math.random() * data.length)
+                shuffeledArray = shuffeledArray.concat(data[random])
+                data.splice(random,1)
+            }
+            if(tabel=="woordenschat_tabel" && mode=="betekenis"){//als meerdere betekenissen per woord mogelijk zijn
+                let teller = 0;
+                shuffeledArray.forEach(function(value){
+                    connection.query("Select betekenis from woordenschat_tabel where romaji_uitspraak=?",[value.romaji_uitspraak],(err, data) => {
+                        if(err){
+                            console.log(err)
+                            res.set({
+                                "CacheControl":"no-cache",
+                                "Pragma":"no-cache",
+                                "Expires":"-1"
+                            }).status(404).send({error:'error deatta'})
+                            return;
+                        }
+                        if(data.length > 1){
+                            value.sameVocab = data
+                        }
+                        teller++;
+                        if(teller == shuffeledArray.length){//code als alles klaar is
+                            res.set({
+                                "CacheControl":"no-cache",
+                                "Pragma":"no-cache",
+                                "Expires":"-1"
+                            }).status(200).send(shuffeledArray);
+                            connection.end()
+                        }
+                    })
+                })
+            }else{
+                res.set({
+                    "CacheControl":"no-cache",
+                    "Pragma":"no-cache",
+                    "Expires":"-1"
+                }).status(200).send(shuffeledArray);
+                connection.end()
+            }
         }
-        connection.end()
-        callback(data)
     });})
 }
 
-const QuestionReturn = (req, res,id,tabel,mode,fout) => {
-    configConnect(function(connection){
+const QuestionReturn = (req, res,tabel,mode) => {
+    configConnect(async function(connection){
+        var hoeveelheid = 0;
         const ca = "opvraag_index_naar_"+mode
         const cb = "aantal_fout_naar_"+mode
         const cc = "juist_streak_naar_"+mode
-        const select = "select *, groep_id as gid,(select MAX(??) from ?? where groep_id=gid) AS max_index,(select MIN(??) from ?? where ?? >0 and groep_id=gid) as min_index,(select MIN(??) from ?? where ?? !=-1 and groep_id=gid) as yokuTobasu from ?? where ??=?"
-        connection.query(select, [ca,tabel,ca,tabel,ca,ca,tabel,ca,tabel,"id"+tabel, id], (err, data) => {
+        var returndata = JSON.parse(req.body);
+        for(let ind=0; ind<returndata.length; ind++){
+            console.log(returndata[ind])
+            //doSomething().then((data)=>{console.log(data)})
+            const data = await new Promise((resolve, reject) => {
+                const select = "select *, groep_id as gid,(select MAX(??) from ?? where groep_id=gid) AS max_index,(select MIN(??) from ?? where ?? >0 and groep_id=gid) as min_index,(select MIN(??) from ?? where ?? !=-1 and groep_id=gid) as yokuTobasu from ?? where ??=?"
+                let query = connection.query(select, [ca,tabel,ca,tabel,ca,ca,tabel,ca,tabel,"id"+tabel, returndata[ind].id], (err,data) => {
+                    if(err) return reject(err);
+                    resolve(data);
+                });
+            });
             let selected;
             let extraSQL = ""
             let extraParameters = []
-            if(err){
-                res.status(500)
-                console.log(err.message)
+            selected = data[0]
+            if(selected[ca] != -1){return}
+            if(returndata[ind].fout=="fout"){
+                selected[cb]++;
+                selected[cc] = 0;
             }else{
-                selected = data[0]
-                if(fout=="fout"){
-                    selected[cb]++;
-                    selected[cc] = 0;
+                if(selected[cb]==0 || selected[cc]>0){
+                    //complex vanaf hier
+                    //nieuwe index selecteren
+                    if(selected.min_index == null){selected.min_index = 0}
+                    selected[ca] = Math.floor(Math.exp(-selected[cb]*0.5) * (selected.max_index-selected.min_index)+selected.min_index)+1
+                    selected[cc] = 0
+                    selected[cb] = 0
+                    extraSQL = "update ?? set ??=-1 where ?? = ? and groep_id = ? limit 1"
+                    if(selected.yokuTobasu == null){selected.yokuTobasu=0}
+                    extraParameters = [tabel,ca,ca, selected.yokuTobasu, selected.groep_id]
                 }else{
-                    if(selected[cb]==0 || selected[cc]>0){
-                        //complex vanaf hier
-                        //nieuwe index selecteren
-                        if(selected.min_index == null){selected.min_index = 0}
-                        selected[ca] = Math.floor(Math.exp(-selected[cb]*0.5) * (selected.max_index-selected.min_index)+selected.min_index)+1
-                        selected[cc] = 0
-                        selected[cb] = 0
-                        extraSQL = "update ?? set ??=-1 where ?? = ? and groep_id = ? limit 1"
-                        if(selected.yokuTobasu == null){selected.yokuTobasu=0}
-                        extraParameters = [tabel,ca,ca, selected.yokuTobasu, selected.groep_id]
-                    }else{
-                        selected[cc]++
-                    }
+                    selected[cc]++
                 }
             }
             const queryry = "update ?? Set ??=?, ??=?,??=? where ?? = ?;"+extraSQL;
             console.log(queryry)
-            connection.query(queryry, [tabel,ca,selected[ca],cb,selected[cb],cc,selected[cc],"id"+tabel, id].concat(extraParameters), (err, data) => {
-                if(err){
-                    res.status(404).send({error:'sou da warui no jibun janai'})
-                    console.log(err)
-                }else{
-                    //console.log('the query answer is: ', data);
-                    res.status(200).send("ok");
-                }
+            await new Promise((resolve, reject) => {
+                let query = connection.query(queryry, [tabel,ca,selected[ca],cb,selected[cb],cc,selected[cc],"id"+tabel, returndata[ind].id].concat(extraParameters), (err,data) => {
+                    if(err) return reject(err);
+                    resolve(data);
+                });
             });
-            connection.end()
-        }); 
+            hoeveelheid++
+            if(hoeveelheid == returndata.length){
+                res.status(200).send("ok");
+                connection.end()
+            }
+        }
     })
 }
 

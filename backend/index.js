@@ -7,7 +7,6 @@ const cors = require("cors")
 const auth = require("./autenticatie.js")
 const routines = require("./routines.js")
 
-var Opvragingen
 var VraagendIP
 global.__dirname = process.cwd();
 
@@ -26,41 +25,13 @@ app.post('/backend/', (req, res) => {
 })
 app.post("/backend/generate100/:groupid/:kanjidb/:mode", (req, res) => { //#
   if(auth.Validate(req,res,req.body,req.params.groupid + req.params.kanjidb + req.params.mode)){
-    databasehelper.ServerGenerate100Questions(req, res, req.params["groupid"], req.params["kanjidb"], req.params["mode"], function(data){
-      Opvragingen = data
-      VraagendIP = auth.getIP(req);
-    })
+    VraagendIP = auth.getIP(req);
+    databasehelper.ServerGenerate100Questions(req, res, req.params["groupid"], req.params["kanjidb"], req.params["mode"])
   }
 })
-app.post("/backend/getQuestion", (req, res) => {
-  if(Opvragingen == []){
-    res.set({
-      "CacheControl":"no-cache",
-      "Pragma":"no-cache",
-      "Expires":"-1"
-    }).json({error: "geen vragen gegenereerd"})
-    console.log(Opvragingen)
-    return;
-  }
-  if(VraagendIP != auth.getIP(req)){
-    res.set({
-      "CacheControl":"no-cache",
-      "Pragma":"no-cache",
-      "Expires":"-1"
-    }).json({error: "ander apparaat opvraging"})
-    return;
-  }
-  let random = Math.floor(Math.random() * Opvragingen.length)
-  res.set({
-    "CacheControl":"no-cache",
-    "Pragma":"no-cache",
-    "Expires":"-1"
-  }).send(Opvragingen[random])
-  Opvragingen.splice(random,1)
-})
-app.put("/backend/returnResult/:id/:db/:mode/:fout", (req, res) => { //#
-  if(auth.Validate(req,res,req.body,req.params.id + req.params.db + req.params.mode + req.params.fout)){
-    databasehelper.QuestionReturn(req, res, req.params.id,req.params.db,req.params.mode,req.params.fout)
+app.post("/backend/returnResult/:db/:mode/*", (req, res) => { //#
+  if(auth.Validate(req,res,routines.extracUrlPart(req.originalUrl,5),req.params.db + req.params.mode)){
+    databasehelper.QuestionReturn(req, res, req.params.db,req.params.mode)
   }
 })
 app.post("/backend/postWoord/:groepid/:uitspraak/:kanji/:betekenis/:notitie", (req, res) => { //#
@@ -101,20 +72,19 @@ app.post("/backend/getEntries/:table",(req,res)=>{ //#
     databasehelper.GetAllEntries(req,res,req.params.table)
   }
 })
-app.post("/backend/zelfdeUitspraak/:uitspraak",(req,res)=>{
+/* app.post("/backend/zelfdeUitspraak/:uitspraak",(req,res)=>{
   if(VraagendIP != auth.getIP(req)){
     res.sendStatus(401)
     return;
   }
   databasehelper.GetSameVocab(req,res,req.params.uitspraak)
-})
+}) */
 app.post("/backend/KeyRandom",(req, res)=>{
   auth.GetRandomModulus(req,res)
 })
 app.post("/backendIMG/:size/*", async (req, res) => { //alleen hier rsa string in de url omdat body = image
   if(auth.Validate(req,res,routines.extracUrlPart(req.originalUrl,3),req.params.size)){
     try{
-      global.__size = req.params.size;
       await util.promisify(fileHelper.upload.single("file"))(req , res);
       if(req.file == undefined){
         return res.status(400).send({ message: "Please upload a file!"});

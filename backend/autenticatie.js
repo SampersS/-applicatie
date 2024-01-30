@@ -60,7 +60,11 @@ const Validate = function(req, res, encryptedData, chstring){   //deencrypted: r
         }
         return true;
     }else{
-        res.json({error:401})
+        if(rand != IpRandomPaaren[getIP(req)] ){
+            res.json({error:"rand verkeerd"})
+        }else{
+            res.json({error: 401})
+        }
         console.log(checksum,chsum, rand, IpRandomPaaren[getIP(req)], swordpas ,process.env.API_WACHTWOORD)
         return false;
     }

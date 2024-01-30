@@ -13,11 +13,14 @@
         var tabel = ""
         var groepid = ""
         var colom = ""
-        var queueReady = 0
+        var listIndex = 0
         var DisplayLinks = {}
         var OplossingLinks = {}
-        var currentData = {}
+        var OpgevraagdeData = []
+        var ReturnData = []
+        var currentQ = {}
         function prepare() {
+            PreparePassword()
             var urldata = window.location.search.split("?")
             console.log(urldata[1])
             tabel = urldata[1];
@@ -28,7 +31,7 @@
                     DisplayLinks.veld1 = "uitspraak voorbeeld"
                     DisplayLinks.veld2 = "betekenis"
                     OplossingLinks.handzuimg = "img"
-                    document.getElementById("Oplos").hidden = true
+                    document.getElementById("Oploss").hidden = true
                     document.getElementById("veld2").hidden = false
                 }else{
                     DisplayLinks.veld1 = "uitspraak voorbeeld"
@@ -47,60 +50,88 @@
                     document.getElementById("veld2").hidden = false
                 }
             }
-            PreparePassword()
             getMeta()
         }
-        const displayNextQuestion = function() {
-            if(queueReady == 0){
-                GetDataPost(serverAddress+apiAdditions+"generate100/"+groepid+"/"+tabel+"/"+colom,function(ret){
-                    if(ret.error == 401){
-                        getMeta(displayNextQuestion)
+        const getNewQuestions = function(cb){
+            GetDataPost(serverAddress+apiAdditions+"generate100/"+groepid+"/"+tabel+"/"+colom,function(ret){
+                    if(ret.error == "rand verkeerd"){
+                        getMeta(getNewQuestions)
                         return;
                     }
-                    queueReady = ret.lengte
-                    if(queueReady==0){
+                    OpgevraagdeData = ret
+                    listIndex = 0;
+                    if(ret.length>100){
+                        alert("database error")
+                    }
+                    if(ret.length==0){
                         return
                     }
-                    GetDataPost(serverAddress+apiAdditions+"getQuestion", DisplayData)
+                    if(cb){
+                        cb()
+                    }
                 },cryptograaf(groepid+tabel+colom, false))
+        }
+        const returnResults = function(cb, args){
+            if(ReturnData.length == 0){
+                if(cb){
+                    cb(args)
+                }
+                console.log("hier")
+                return
+            }
+            var httpp = new XMLHttpRequest();
+            httpp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    console.log(httpp.responseText)
+                    ReturnData = []
+                    if(cb){
+                        cb(args)
+                    }
+                }
+            };
+            var url = serverAddress+apiAdditions+"returnResult/"+tabel+"/"+colom+"/"+cryptograaf(tabel+colom, false)
+            httpp.open('POST', url, false);
+            httpp.send(JSON.stringify(ReturnData));
+        }
+        const displayNextQuestion = function() {
+            if(listIndex == OpgevraagdeData.length){
+                returnResults(getNewQuestions,function(){
+                    currentQ = OpgevraagdeData[listIndex]
+                    DisplayData()
+                    listIndex++;
+                });
             }else{
-                GetDataPost(serverAddress+apiAdditions+"getQuestion", DisplayData)  
+                currentQ = OpgevraagdeData[listIndex]
+                DisplayData()
+                listIndex++;
             }
         }
-        const DisplayData = function(data){
-            if(data.error != undefined){
-                console.error(data.error)
-                queueReady = 0;
-                displayNextQuestion();
-                return;
-            }
+        const DisplayData = function(){
             document.getElementById("tabel").hidden = true
-            document.getElementById("veld1").value = data[DisplayLinks.veld1];
+            document.getElementById("veld1").value = currentQ[DisplayLinks.veld1];
             if(DisplayLinks.veld2 != undefined){
-                document.getElementById("veld2").value = data[DisplayLinks.veld2];
+                document.getElementById("veld2").value = currentQ[DisplayLinks.veld2];
             }
             if(DisplayLinks.handzuimg != undefined){
                 //console.log(decodeURI(data[DisplayLinks.handzuimg]))
-                document.getElementById("handzuimg").src = serverAddress + apiIMGAdditions + data[DisplayLinks.handzuimg];
+                document.getElementById("handzuimg").src = serverAddress + apiIMGAdditions + currentQ[DisplayLinks.handzuimg];
             }else{
                 document.getElementById("handzuimg").src = ""
             }
             document.getElementById("Oploss").textContent = ""
-            queueReady--
             document.getElementById("btnNext").disabled = true;
             document.getElementById("btnOploss").disabled = false
             var rij = document.getElementsByClassName("btnRate")
             for(var i = 0; i < rij.length; i++){
                 rij[i].disabled = true
             }
-            currentData = data
         }
         const ToonOploss = function(){
             if(OplossingLinks.handzuimg != undefined){
-                document.getElementById("handzuimg").src = serverAddress + apiIMGAdditions + currentData[OplossingLinks.handzuimg];
+                document.getElementById("handzuimg").src = serverAddress + apiIMGAdditions + currentQ[OplossingLinks.handzuimg];
             }
             if(OplossingLinks.Oploss != undefined){
-                document.getElementById("Oploss").textContent = currentData[OplossingLinks.Oploss];
+                document.getElementById("Oploss").textContent = currentQ[OplossingLinks.Oploss];
             }
             var rij = document.getElementsByClassName("btnRate")
             for(var i = 0; i < rij.length; i++){
@@ -108,34 +139,28 @@
             }
             document.getElementById("btnOploss").disabled = true
             document.getElementById("btnNext").disabled = false
-            if(tabel == "woordenschat_tabel" && colom == "betekenis"){
-                GetDataPost(serverAddress+apiAdditions+"zelfdeUitspraak/"+currentData.romaji_uitspraak,function(data){
-                    if(data.length> 1){
-                        var tabelElement = document.getElementById("tabel")
-                        tabelElement.hidden = false
-                        var rowCount = tabelElement.rows.length;
-                        for (var i = 1; i < rowCount; i++) {
-                            tabelElement.deleteRow(1);
-                        }
-                        for(var index = 0; index < data.length; index++){
-                            var newrow = tabelElement.insertRow()
-                            var cel1 = newrow.insertCell();
-                            cel1.appendChild(document.createTextNode(data[index].betekenis))
-                        }
+            if(tabel == "woordenschat_tabel" && colom == "betekenis"){                
+                if(currentQ.sameVocab != undefined){
+                    var tabelElement = document.getElementById("tabel")
+                    tabelElement.hidden = false
+                    var rowCount = tabelElement.rows.length;
+                    for (var i = 1; i < rowCount; i++) {
+                        tabelElement.deleteRow(1);
                     }
-                })
+                    for(var index = 0; index < currentQ.sameVocab.length; index++){
+                        var newrow = tabelElement.insertRow()
+                        var cel1 = newrow.insertCell();
+                        cel1.appendChild(document.createTextNode(currentQ.sameVocab[index].betekenis))
+                    }
+                }
             }
         }
         const rate = function(reslt){
-            var http = new XMLHttpRequest();
+            ReturnData = ReturnData.concat({"id":currentQ["id"+tabel],"fout":reslt})
             var rij = document.getElementsByClassName("btnRate")
             for(var i = 0; i < rij.length; i++){
                 rij[i].disabled = true
             }
-            var url = serverAddress+apiAdditions+"returnResult/"+currentData["id"+tabel]+"/"+tabel+"/"+colom+"/"+reslt;
-            http.open('PUT', url, true);
-            http.setRequestHeader("Content-Type","text/plain")
-            http.send(cryptograaf(currentData["id"+tabel]+tabel+colom+reslt, false));
         }
     </script>
 </head>
@@ -154,6 +179,7 @@
         <input type="button" onclick="rate('goed')" id="goodrate" class="btnRate" disabled value="Goed">
         <input type="button" onclick="rate('fout')" id="badrate" class="btnRate" disabled value="Fout"><br>
         <input type="button" onclick="displayNextQuestion()" id="btnNext" value="Volgende Vraag"><br>
+        <input type="button" onclick="returnResults()" id="btnSVE" value="save"><br>
     </form>
     <table id="tabel" hidden>
         <tr>
