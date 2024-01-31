@@ -1,20 +1,13 @@
-const dotenv = require("dotenv")
 const mysql = require("mysql")
 let aantalKanji;
 let aantalWoorden;
 
 let configConnect = (returnCode) => {
-    dotenv.config();
-    const dbhost = process.env.DB_HOST;
-    const dbuser = process.env.DB_USER;
-    const dbpass = process.env.DB_PASS;
-    const database = process.env.DB_DTBS;
-
     let connection = mysql.createConnection({
-        host: dbhost,
-        user: dbuser,
-        password: dbpass,
-        database: database,
+        host: global.__dbhost,
+        user: global.__dbuser,
+        password: global.__dbpass,
+        database: global.__database,
         multipleStatements: true
     });
     connection.connect(error => {
@@ -111,6 +104,7 @@ const QuestionReturn = (req, res,tabel,mode) => {
                 });
             });
             let selected;
+            console.log(data)
             let extraSQL = ""
             let extraParameters = []
             selected = data[0]

@@ -6,9 +6,17 @@ const fileHelper = require("./fileHelper.js")
 const cors = require("cors")
 const auth = require("./autenticatie.js")
 const routines = require("./routines.js")
+const dotenv = require("dotenv")
+
+dotenv.config();
+global.__dbhost = process.env.DB_HOST;
+global.__dbuser = process.env.DB_USER;
+global.__dbpass = process.env.DB_PASS;
+global.__database = process.env.DB_DTBS;
+global.__dirname = process.env.FILE_PATH;
+global.__apipw = process.env.API_WACHTWOORD;
 
 var VraagendIP
-global.__dirname = process.cwd();
 
 const app = express()
 app.use(cors());
@@ -109,7 +117,8 @@ app.delete("/backendIMG/:id", (req, res) => { //#
   }
 })
 app.get("/html/*", (req, res) => {
-  res.sendFile(global.__dirname+"/html/"+routines.extracUrlPart(req.originalUrl,2).split("?")[0])
+   console.log(global.__dirname+"/html/"+routines.extracUrlPart(req.originalUrl,2).split('?')[0])
+   res.sendFile(global.__dirname+"/html/"+routines.extracUrlPart(req.originalUrl,2).split('?')[0])
 })
 app.listen(port, () => {
   console.log(`Backend app listening on port ${port}`)
