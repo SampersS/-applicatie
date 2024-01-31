@@ -47,6 +47,15 @@
                 Image = fileelement.files[0]
             }
         }
+        function VeNiLe(classname){
+            var elms = document.getElementsByClassName(classname)
+            for(var i = 0; i < elms.length; i++){
+                if(elms[i].value == ""){
+                    return false
+                }
+            }
+            return true
+        }
         const sendData = function(){   
             let selecvalu = document.getElementById("Kanjimode").value;
             let groepElement = document.getElementById("groepen");
@@ -59,31 +68,41 @@
             urlparm["pad"] = ""
             if(notitieElement.value == "") {notitieElement.value = " "}
             if(selecvalu == "charakter_tabel"){
-                urlparm["ap"] = "postKanji/"
-                urlparm["pad"] += groepElement.value + "/"
-                urlparm["pad"] += uitspraakElement.value +"/"
-                urlparm["pad"] += betekenisElement.value +"/"
-                urlparm["pad"] += charElement.value +"/"
-                urlparm["pad"] += Image.name + "/"
-                urlparm["pad"] += notitieElement.value+"/"
-                let formData = new FormData();
-                formData.append('file', Image);
-                var http = new XMLHttpRequest();
-                var url = serverAddress+apiIMGAdditions+Image.size;
-                http.open('POST', url+"/"+cryptograaf(Image.size, false), false);
-                http.send(formData);
+                if(VeNiLe("v1")&&document.getElementById("file_input").files.length != 0){
+                    urlparm["ap"] = "postKanji/"
+                    urlparm["pad"] += groepElement.value + "/"
+                    urlparm["pad"] += uitspraakElement.value +"/"
+                    urlparm["pad"] += betekenisElement.value +"/"
+                    urlparm["pad"] += charElement.value +"/"
+                    urlparm["pad"] += Image.name + "/"
+                    urlparm["pad"] += notitieElement.value+"/"
+                    let formData = new FormData();
+                    formData.append('file', Image);
+                    var http = new XMLHttpRequest();
+                    var url = serverAddress+apiIMGAdditions+Image.size;
+                    http.open('POST', url+"/"+cryptograaf(Image.size, false), false);
+                    http.send(formData);
+                }else{
+                    alert("onvolledige invoer")
+                    return
+                }
             }else{
-                urlparm["ap"] = "postWoord/"
-                urlparm["pad"] += groepElement.value+"/"
-                urlparm["pad"] += uitspraakElement.value+"/"
-                urlparm["pad"] += kanjigeschrevenElement.value+"/"
-                urlparm["pad"] += betekenisElement.value+"/"
-                urlparm["pad"] += notitieElement.value+"/"
+                if(VeNiLe("v2")){
+                    urlparm["ap"] = "postWoord/"
+                    urlparm["pad"] += groepElement.value+"/"
+                    urlparm["pad"] += uitspraakElement.value+"/"
+                    urlparm["pad"] += kanjigeschrevenElement.value+"/"
+                    urlparm["pad"] += betekenisElement.value+"/"
+                    urlparm["pad"] += notitieElement.value+"/"
+                }else{
+                    alert("onvolledige invoer")
+                    return
+                }
             }
             var http = new XMLHttpRequest();
             http.open('POST', serverAddress+apiAdditions+urlparm["ap"]+urlparm["pad"]);
             http.send(cryptograaf(urlparm["pad"], true));
-            window.location.href = "menu.html"
+            //window.location.href = "menu.html"
         }
         </script>
 </head>
@@ -94,7 +113,7 @@
     <input type="password" id="txtPassword"><br>
 </div>
 <p style="margin: 0px;">Selecteer je mode</p>
-    <select name="Kanjimode" id="Kanjimode" onchange="nextModeEnable()">
+    <select id="Kanjimode" onchange="nextModeEnable()" class="v1 v2">
         <option value=""></option>
         <option value="charakter_tabel">Kanji</option>
         <option value="woordenschat_tabel">Woordenschat</option>   
@@ -102,18 +121,18 @@
     <p style="margin: 0px;">welke groep?</p>
     <select name="groepen" id="groepen"></select><br>
     <label for="txtUitspraak">Uitspraak:</label><br>
-    <input id="txtUitspraak"><br>
+    <input id="txtUitspraak" class="v1 v2"><br>
     <label for="txtBetekenis">Betekenis:</label><br>
-    <input id="txtBetekenis"><br>
+    <input id="txtBetekenis" class="v1 v2"><br>
     <div id="kanjimode" style="display: none;">
         <label for="txtChar">Charakter:</label><br>
-        <input id="txtChar"><br>
+        <input id="txtChar" class="v1"><br>
         <label for="file_input">Afbeelding van kanji:</label><br>
         <input id="file_input" onchange="getFile()" accept="image/*" type="file"><br>
     </div>
     <div id="vocabmode" style="display: none;">
         <label for="txtKanjiWrite">In kanji geschreven:</label><br>
-        <input id="txtKanjiWrite"><br>
+        <input id="txtKanjiWrite" class="v2"><br>
     </div>
     <label for="txtNotitie">Notitie:</label><br>
     <input id="txtNotitie"><br>

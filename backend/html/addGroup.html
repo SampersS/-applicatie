@@ -35,6 +35,8 @@
             var http = new XMLHttpRequest();
             http.open('POST', url, false);
             http.send(cryptograaf(naam, false))
+        }else{
+            alert("je moet wel een naam invullen hé")
         }
     }
     const prepare = function(){

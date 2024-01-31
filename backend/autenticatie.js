@@ -54,9 +54,6 @@ const Validate = function(req, res, encryptedData, chstring){   //deencrypted: r
     let swordpas = decryptedData.substring(16)
     if(checksum == chsum && rand == IpRandomPaaren[getIP(req)] && swordpas == global.__apipw){
         IpRandomPaaren[getIP(req)]++;
-        if(IpRandomPaaren[getIP(req)] > 4294967296){
-            IpRandomPaaren[getIP(req)] = 0
-        }
         return true;
     }else{
         if(rand != IpRandomPaaren[getIP(req)] ){

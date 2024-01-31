@@ -24,9 +24,9 @@ const ServerGenerate100Questions = (req, res,group,tabel,mode) => {
     configConnect(function(connection){
         var queryry;
         if(tabel == "charakter_tabel"){
-            queryry = "SELECT idcharakter_tabel, `uitspraak voorbeeld`, betekenis , ckarakter , img, notitie FROM ?? where ?? = -1 and groep_id=?"
+            queryry = "SELECT idcharakter_tabel as id, `uitspraak voorbeeld` as ui, betekenis as be , ckarakter as ck , img as im, notitie as no FROM ?? where ?? = -1 and groep_id=?"
         }else{
-            queryry = "SELECT idwoordenschat_tabel, romaji_uitspraak, kanji, betekenis, notitie FROM ?? where ?? = -1 and groep_id=?"
+            queryry = "SELECT idwoordenschat_tabel as id, romaji_uitspraak as ro, kanji as ka, betekenis as be, notitie as no FROM ?? where ?? = -1 and groep_id=?"
         }
         console.log("generator...")
         connection.query(queryry, [tabel,"opvraag_index_naar_"+mode,group], (err, data) => {
@@ -50,7 +50,7 @@ const ServerGenerate100Questions = (req, res,group,tabel,mode) => {
             if(tabel=="woordenschat_tabel" && mode=="betekenis"){//als meerdere betekenissen per woord mogelijk zijn
                 let teller = 0;
                 shuffeledArray.forEach(function(value){
-                    connection.query("Select betekenis from woordenschat_tabel where romaji_uitspraak=?",[value.romaji_uitspraak],(err, data) => {
+                    connection.query("Select betekenis from woordenschat_tabel where romaji_uitspraak=?",[value.ro],(err, data) => {
                         if(err){
                             console.log(err)
                             res.set({
@@ -61,7 +61,7 @@ const ServerGenerate100Questions = (req, res,group,tabel,mode) => {
                             return;
                         }
                         if(data.length > 1){
-                            value.sameVocab = data
+                            value.sa = data
                         }
                         teller++;
                         if(teller == shuffeledArray.length){//code als alles klaar is
@@ -93,12 +93,12 @@ const QuestionReturn = (req, res,tabel,mode) => {
         const cb = "aantal_fout_naar_"+mode
         const cc = "juist_streak_naar_"+mode
         var returndata = JSON.parse(req.body);
-        for(let ind=0; ind<returndata.length; ind++){
+        for(let ind in returndata){
             console.log(returndata[ind])
             //doSomething().then((data)=>{console.log(data)})
             const data = await new Promise((resolve, reject) => {
                 const select = "select *, groep_id as gid,(select MAX(??) from ?? where groep_id=gid) AS max_index,(select MIN(??) from ?? where ?? >0 and groep_id=gid) as min_index,(select MIN(??) from ?? where ?? !=-1 and groep_id=gid) as yokuTobasu from ?? where ??=?"
-                let query = connection.query(select, [ca,tabel,ca,tabel,ca,ca,tabel,ca,tabel,"id"+tabel, returndata[ind].id], (err,data) => {
+                let query = connection.query(select, [ca,tabel,ca,tabel,ca,ca,tabel,ca,tabel,"id"+tabel, ind], (err,data) => {
                     if(err) return reject(err);
                     resolve(data);
                 });
@@ -109,7 +109,7 @@ const QuestionReturn = (req, res,tabel,mode) => {
             let extraParameters = []
             selected = data[0]
             if(selected[ca] != -1){return}
-            if(returndata[ind].fout=="fout"){
+            if(returndata[ind]=="fout"){
                 selected[cb]++;
                 selected[cc] = 0;
             }else{
@@ -130,17 +130,15 @@ const QuestionReturn = (req, res,tabel,mode) => {
             const queryry = "update ?? Set ??=?, ??=?,??=? where ?? = ?;"+extraSQL;
             console.log(queryry)
             await new Promise((resolve, reject) => {
-                let query = connection.query(queryry, [tabel,ca,selected[ca],cb,selected[cb],cc,selected[cc],"id"+tabel, returndata[ind].id].concat(extraParameters), (err,data) => {
+                let query = connection.query(queryry, [tabel,ca,selected[ca],cb,selected[cb],cc,selected[cc],"id"+tabel, ind].concat(extraParameters), (err,data) => {
                     if(err) return reject(err);
                     resolve(data);
                 });
             });
-            hoeveelheid++
-            if(hoeveelheid == returndata.length){
-                res.status(200).send("ok");
-                connection.end()
-            }
+            hoeveelheid++;
         }
+        res.status(200).json({"ontvangen":hoeveelheid});
+        connection.end()
     })
 }
 
