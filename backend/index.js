@@ -1,5 +1,5 @@
 const express = require("express")
-const port = 3000
+const port = 80
 const databasehelper = require("./db")
 const util = require("util")
 const fileHelper = require("./fileHelper.js")
@@ -107,6 +107,9 @@ app.delete("/backendIMG/:id", (req, res) => { //#
   if(auth.Validate(req,res,req.body,req.params.id)){
     fileHelper.deleteFile(req,res)
   }
+})
+app.get("/html/*", (req, res) => {
+  res.sendFile(global.__dirname+"/html/"+routines.extracUrlPart(req.originalUrl,2).split("?")[0])
 })
 app.listen(port, () => {
   console.log(`Backend app listening on port ${port}`)
