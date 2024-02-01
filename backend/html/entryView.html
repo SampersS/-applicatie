@@ -11,7 +11,7 @@
     <script src="./lib/tools.js"></script>
 </head>
 <body onload="PreparePassword();getMeta()">
-    <div id="pwobj" style="display:none">
+    <div id="pwobj" hidden>
         <label for="txtPassword">Wachtwoord:</label><br>
         <input type="password" id="txtPassword"><br>
     </div>
@@ -47,9 +47,8 @@
     const ExtraRows = 2
     var curData
     const nextModeEnable = function(){
-        let element = document.getElementById("Kanjimode")
-        let tabel = document.getElementById("tabel")
-
+        var element = document.getElementById("Kanjimode")
+        var tabel = document.getElementById("tabel")
         if(element.value == ""){
             return
         }
@@ -67,59 +66,59 @@
         },cryptograaf(element.value, false))
     }
     const RefreshList = function(){
-        let data = curData
-        let tabel = document.getElementById("tabel")
-        let element = document.getElementById("Kanjimode")
+        var data = curData
+        var tabel = document.getElementById("tabel")
+        var element = document.getElementById("Kanjimode")
         var rowCount = tabel.rows.length;
         for (var i = ExtraRows; i < rowCount; i++) {
             tabel.deleteRow(ExtraRows);
         }
-        for(let index = 0; index < data.length; index++){
-            let newrow = tabel.insertRow()
-            let cel1 = newrow.insertCell();
-            let cel2 = newrow.insertCell()
-            let cel3 = newrow.insertCell();
-            let cel4 = newrow.insertCell();
-            let cel5 = newrow.insertCell();
-            let cel6
+        for(var index = 0; index < data.length; index++){
+            var newrow = tabel.insertRow(index+ExtraRows)
+            var cel1 = newrow.insertCell(-1);
+            var cel2 = newrow.insertCell(-1)
+            var cel3 = newrow.insertCell(-1);
+            var cel4 = newrow.insertCell(-1);
+            var cel5 = newrow.insertCell(-1);
+            var cel6
             if(element.value == "charakter_tabel"){
-                cel6 = newrow.insertCell();
+                cel6 = newrow.insertCell(-1);
             }
-            let cel7 = newrow.insertCell();
-            let cel8 = newrow.insertCell();
-            let id_nr
+            var cel7 = newrow.insertCell(-1);
+            var cel8 = newrow.insertCell(-1);
+            var id_nr
             if(element.value == "charakter_tabel"){
                 id_nr = data[index].idcharakter_tabel
-                let id = document.createTextNode(data[index].idcharakter_tabel);
+                var id = document.createTextNode(data[index].idcharakter_tabel);
                 cel1.appendChild(id)
-                let gr = document.createTextNode(data[index].groep_id);
+                var gr = document.createTextNode(data[index].groep_id);
                 cel2.appendChild(gr)
-                let uv = document.createTextNode(data[index]["uitspraak voorbeeld"]);
+                var uv = document.createTextNode(data[index]["uitspraak voorbeeld"]);
                 cel3.appendChild(uv)
-                let bet = document.createTextNode(data[index].betekenis);
+                var bet = document.createTextNode(data[index].betekenis);
                 cel4.appendChild(bet)
-                let ch = document.createTextNode(data[index].ckarakter);
+                var ch = document.createTextNode(data[index].ckarakter);
                 cel5.appendChild(ch)
-                let im = document.createTextNode(data[index].img);
+                var im = document.createTextNode(data[index].img);
                 cel6.appendChild(im)
 
             }else{
                 id_nr = data[index].idwoordenschat_tabel
                 id = document.createTextNode(data[index].idwoordenschat_tabel);
                 cel1.appendChild(id)
-                let gr = document.createTextNode(data[index].groep_id);
+                var gr = document.createTextNode(data[index].groep_id);
                 cel2.appendChild(gr)
-                let uv = document.createTextNode(data[index]["romaji_uitspraak"]);
+                var uv = document.createTextNode(data[index]["romaji_uitspraak"]);
                 cel3.appendChild(uv)
-                let bet = document.createTextNode(data[index].betekenis);
+                var bet = document.createTextNode(data[index].betekenis);
                 cel4.appendChild(bet)
-                let kj = document.createTextNode(data[index].kanji);
+                var kj = document.createTextNode(data[index].kanji);
                 cel5.appendChild(kj)
 
             }
-            let nt = document.createTextNode(data[index].notitie);
+            var nt = document.createTextNode(data[index].notitie);
             cel7.appendChild(nt)
-            let bt = document.createElement("BUTTON");
+            var bt = document.createElement("BUTTON");
             bt.appendChild(document.createTextNode("verwijder"));
             bt.addEventListener("click", function(){Delete(id_nr,index+ExtraRows)});
             cel8.appendChild(bt)
@@ -128,8 +127,8 @@
     const Delete = function(id, index){
         console.log("te verwijderen:",index)
         var xhttp = new XMLHttpRequest();
-        let element = document.getElementById("Kanjimode")
-        let tabelElement = document.getElementById("tabel")
+        var element = document.getElementById("Kanjimode")
+        var tabelElement = document.getElementById("tabel")
         url = serverAddress+apiAdditions
         if(element.value == "charakter_tabel"){
             url += "deleteKanji/"

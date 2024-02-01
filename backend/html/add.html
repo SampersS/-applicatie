@@ -12,10 +12,10 @@
     <script>
         var Image = null
         const nextModeEnable = function(){
-            let selecvalu = document.getElementById("Kanjimode").value;
-            let kanjiElement = document.getElementById("kanjimode")
-            let vocabElement = document.getElementById("vocabmode")
-            let subBut = document.getElementById("btnSubmit")
+            var selecvalu = document.getElementById("Kanjimode").value;
+            var kanjiElement = document.getElementById("kanjimode")
+            var vocabElement = document.getElementById("vocabmode")
+            var subBut = document.getElementById("btnSubmit")
             subBut.disabled = false
             kanjiElement.style.display = "none"
             vocabElement.style.display = "none"
@@ -28,24 +28,17 @@
             }
         }
         const prepare = function(){
-            let string = serverAddress+apiAdditions+"getGroups"
-            let groepElement = document.getElementById("groepen");
+            var string = serverAddress+apiAdditions+"getGroups"
+            var groepElement = document.getElementById("groepen");
             PreparePassword()
             GetDataPost(string, function(data){
-                for (let index = 0; index < data.length; index++) {
+                for (var index = 0; index < data.length; index++) {
                     option = new Option(data[index].naam, data[index].idgroep_namen);
                     groepElement.add( option );
                     console.log(data[index])
                 }
                 getMeta();
             })
-        }
-        const getFile = function(){
-            let fileelement = document.getElementById("file_input")
-            if(fileelement.files.length!=0 && fileelement.files[0].type.indexOf("image") != -1){
-                console.log(fileelement.files[0].size)
-                Image = fileelement.files[0]
-            }
         }
         function VeNiLe(classname){
             var elms = document.getElementsByClassName(classname)
@@ -57,30 +50,31 @@
             return true
         }
         const sendData = function(){   
-            let selecvalu = document.getElementById("Kanjimode").value;
-            let groepElement = document.getElementById("groepen");
-            let uitspraakElement = document.getElementById("txtUitspraak")
-            let betekenisElement = document.getElementById("txtBetekenis")
-            let charElement = document.getElementById("txtChar")
-            let kanjigeschrevenElement = document.getElementById("txtKanjiWrite")
-            let notitieElement = document.getElementById("txtNotitie")
-            let urlparm = []
+            var selecvalu = document.getElementById("Kanjimode").value;
+            var groepElement = document.getElementById("groepen");
+            var uitspraakElement = document.getElementById("txtUitspraak")
+            var betekenisElement = document.getElementById("txtBetekenis")
+            var charElement = document.getElementById("txtChar")
+            var kanjigeschrevenElement = document.getElementById("txtKanjiWrite")
+            var notitieElement = document.getElementById("txtNotitie")
+            var fileInput = document.getElementById("file_input");
+            var urlparm = []
             urlparm["pad"] = ""
             if(notitieElement.value == "") {notitieElement.value = " "}
             if(selecvalu == "charakter_tabel"){
-                if(VeNiLe("v1")&&document.getElementById("file_input").files.length != 0){
+                if(VeNiLe("v1")&& fileInput.files.length != 0){
                     urlparm["ap"] = "postKanji/"
                     urlparm["pad"] += groepElement.value + "/"
                     urlparm["pad"] += uitspraakElement.value +"/"
                     urlparm["pad"] += betekenisElement.value +"/"
                     urlparm["pad"] += charElement.value +"/"
-                    urlparm["pad"] += Image.name + "/"
+                    urlparm["pad"] += fileInput.files[0].name + "/"
                     urlparm["pad"] += notitieElement.value+"/"
-                    let formData = new FormData();
-                    formData.append('file', Image);
+                    var formData = new FormData();
+                    formData.append('file', fileInput.files[0]);
                     var http = new XMLHttpRequest();
-                    var url = serverAddress+apiIMGAdditions+Image.size;
-                    http.open('POST', url+"/"+cryptograaf(Image.size, false), false);
+                    var url = serverAddress+apiIMGAdditions+fileInput.files[0].size;
+                    http.open('POST', url+"/"+cryptograaf(fileInput.files[0].size, false), false);
                     http.send(formData);
                 }else{
                     alert("onvolledige invoer")
@@ -107,11 +101,11 @@
         </script>
 </head>
 <body onload="prepare()">
-<h1>Voeg een entry toe</h1>
-<div id="pwobj" style="display:none">
+<div id="pwobj" hidden>
     <label for="txtPassword">Wachtwoord:</label><br>
     <input type="password" id="txtPassword"><br>
 </div>
+<h1>Voeg een entry toe</h1>
 <p style="margin: 0px;">Selecteer je mode</p>
     <select id="Kanjimode" onchange="nextModeEnable()" class="v1 v2">
         <option value=""></option>
@@ -128,7 +122,7 @@
         <label for="txtChar">Charakter:</label><br>
         <input id="txtChar" class="v1"><br>
         <label for="file_input">Afbeelding van kanji:</label><br>
-        <input id="file_input" onchange="getFile()" accept="image/*" type="file"><br>
+        <input id="file_input" accept="image/*" type="file"><br>
     </div>
     <div id="vocabmode" style="display: none;">
         <label for="txtKanjiWrite">In kanji geschreven:</label><br>

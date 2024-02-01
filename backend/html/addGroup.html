@@ -11,7 +11,7 @@
     <script src="./lib/tools.js"></script>
 </head>
 <body onload="prepare()">
-    <div id="pwobj" style="display:none">
+    <div id="pwobj" hidden>
         <label for="txtPassword">Wachtwoord:</label><br>
         <input type="password" id="txtPassword"><br>
     </div>
@@ -29,9 +29,9 @@
 </body>
 <script>
     const sendNew = function(){
-        let naam = document.getElementById("txtnaam").value
+        var naam = document.getElementById("txtnaam").value
         if(naam != ""){
-            let url = serverAddress+apiAdditions+"addGroup/"+naam
+            var url = serverAddress+apiAdditions+"addGroup/"+naam
             var http = new XMLHttpRequest();
             http.open('POST', url, false);
             http.send(cryptograaf(naam, false))
@@ -40,17 +40,17 @@
         }
     }
     const prepare = function(){
-        let string = serverAddress+apiAdditions+"getGroups"
-        let groepElement = document.getElementById("groepen");
+        var string = serverAddress+apiAdditions+"getGroups"
+        var groepElement = document.getElementById("groepen");
         PreparePassword()
+        var tabelElement = document.getElementById("tabel")
         GetDataPost(string, function(data){
-            for (let index = 0; index < data.length; index++) {
-                let tabelElement = document.getElementById("tabel")
-                let newrow = tabelElement.insertRow()
-                let cel1 = newrow.insertCell();
-                let cel2 = newrow.insertCell();
-                let id = document.createTextNode(data[index].idgroep_namen);
-                let naam = document.createTextNode(data[index].naam);
+            for (var index = 0; index < data.length; index++) {
+                var newrow = tabelElement.insertRow(index+1)
+                var cel1 = newrow.insertCell(0);
+                var cel2 = newrow.insertCell(1);
+                var id = document.createTextNode(data[index].idgroep_namen);
+                var naam = document.createTextNode(data[index].naam);
                 cel1.appendChild(id)
                 cel2.appendChild(naam)
             }

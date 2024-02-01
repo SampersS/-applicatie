@@ -104,7 +104,6 @@ const QuestionReturn = (req, res,tabel,mode) => {
                 });
             });
             let selected;
-            console.log(data)
             let extraSQL = ""
             let extraParameters = []
             selected = data[0]
@@ -127,6 +126,7 @@ const QuestionReturn = (req, res,tabel,mode) => {
                     selected[cc]++
                 }
             }
+            console.log(data)
             const queryry = "update ?? Set ??=?, ??=?,??=? where ?? = ?;"+extraSQL;
             console.log(queryry)
             await new Promise((resolve, reject) => {
