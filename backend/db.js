@@ -107,7 +107,7 @@ const QuestionReturn = (req, res,tabel,mode) => {
             let extraSQL = ""
             let extraParameters = []
             selected = data[0]
-            if(selected[ca] != -1){return}
+            if(selected[ca] != -1){continue}
             if(returndata[ind]=="fout"){
                 selected[cb]++;
                 selected[cc] = 0;

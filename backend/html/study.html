@@ -172,7 +172,7 @@
                         tabelElement.deleteRow(1);
                     }
                     for(var index = 0; index < currentQ.sa.length; index++){
-                        var newrow = tabelElement.insertRow(index)
+                        var newrow = tabelElement.insertRow(index+1)
                         var cel1 = newrow.insertCell(0);
                         cel1.appendChild(document.createTextNode(currentQ.sa[index].betekenis))
                     }

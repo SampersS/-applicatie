@@ -2,4 +2,5 @@
 *.pem
 **/node_modules
 **/images
+**/backup
 *.log
