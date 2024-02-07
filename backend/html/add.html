@@ -99,37 +99,44 @@
             //window.location.href = "menu.html"
         }
         </script>
+        <link rel="stylesheet" href="css/algemeen.css">
 </head>
 <body onload="prepare()">
-<div id="pwobj" hidden>
-    <label for="txtPassword">Wachtwoord:</label><br>
-    <input type="password" id="txtPassword"><br>
-</div>
-<h1>Voeg een entry toe</h1>
-<p style="margin: 0px;">Selecteer je mode</p>
-    <select id="Kanjimode" onchange="nextModeEnable()" class="v1 v2">
-        <option value=""></option>
-        <option value="charakter_tabel">Kanji</option>
-        <option value="woordenschat_tabel">Woordenschat</option>   
-    </select>
-    <p style="margin: 0px;">welke groep?</p>
-    <select name="groepen" id="groepen"></select><br>
-    <label for="txtUitspraak">Uitspraak:</label><br>
-    <input id="txtUitspraak" class="v1 v2"><br>
-    <label for="txtBetekenis">Betekenis:</label><br>
-    <input id="txtBetekenis" class="v1 v2"><br>
-    <div id="kanjimode" style="display: none;">
-        <label for="txtChar">Charakter:</label><br>
-        <input id="txtChar" class="v1"><br>
-        <label for="file_input">Afbeelding van kanji:</label><br>
-        <input id="file_input" accept="image/*" type="file"><br>
+    <div style="display: flex; flex-direction: row; justify-content: center; height: 100%;">
+        <div style="display: flex; flex-direction: column; justify-content: center; height: 100%;">
+            <div class="container">
+                <div id="pwobj" hidden>
+                    <label for="txtPassword">Wachtwoord:</label><br>
+                    <input type="password" id="txtPassword" class="inputveld"><br>
+                </div>
+                <h1>Voeg een entry toe</h1>
+                <p style="margin: 0px;">Selecteer je mode</p>
+                <select id="Kanjimode" onchange="nextModeEnable()" class="v1 v2 klikbaar">
+                    <option value=""></option>
+                    <option value="charakter_tabel">Kanji</option>
+                    <option value="woordenschat_tabel">Woordenschat</option>   
+                </select>
+                <p style="margin: 0px;">welke groep?</p>
+                <select name="groepen" id="groepen" class="klikbaar"></select><br>
+                <label for="txtUitspraak">Uitspraak:</label><br>
+                <input id="txtUitspraak" class="v1 v2 inputveld"><br>
+                <label for="txtBetekenis">Betekenis:</label><br>
+                <input id="txtBetekenis" class="v1 v2 inputveld"><br>
+                <div id="kanjimode" style="display: none;">
+                    <label for="txtChar">Charakter:</label><br>
+                    <input id="txtChar" class="v1 inputveld"><br>
+                    <label for="file_input">Afbeelding van kanji:</label><br>
+                    <input id="file_input" accept="image/*" type="file" class="klikbaar"><br>
+                </div>
+                <div id="vocabmode" style="display: none;">
+                    <label for="txtKanjiWrite">In kanji geschreven:</label><br>
+                    <input id="txtKanjiWrite" class="v2 inputveld"><br>
+                </div>
+                <label for="txtNotitie">Notitie:</label><br>
+                <input id="txtNotitie" class="inputveld"><br>
+                <button onclick="sendData()" id="btnSubmit" class="klikbaar" disabled>Verstuur</button>
+            </div>
+        </div>
     </div>
-    <div id="vocabmode" style="display: none;">
-        <label for="txtKanjiWrite">In kanji geschreven:</label><br>
-        <input id="txtKanjiWrite" class="v2"><br>
-    </div>
-    <label for="txtNotitie">Notitie:</label><br>
-    <input id="txtNotitie"><br>
-    <button onclick="sendData()" id="btnSubmit" disabled>Verstuur</button>
 </body>
 </html>

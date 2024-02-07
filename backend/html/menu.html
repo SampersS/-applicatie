@@ -47,30 +47,43 @@
             window.location.href = url;
         }
     </script>
+    <link rel="stylesheet" href="css/algemeen.css">
+    <link rel="stylesheet" href="css/menubalk.css">
 </head>
 <body onload="PreparePassword()">
-    <div id="menu">
-        <div id="modeselecting">
-            <p style="margin: 0px;">Selecteer je mode</p>
-            <select id="Kanjimode" onchange="nextModeEnable()">
-                <option value=""></option>
-                <option value="charakter_tabel">Kanji</option>
-                <option value="woordenschat_tabel">Woordenschat</option>
-            </select><br>
-            <p style="margin: 0px;">welke kolom opvragen?</p>
-            <select id="richtingmode" disabled></select><br>
-            <p style="margin: 0px;">welke groep?</p>
-            <select id="groepen" disabled></select><br>
-            <button onclick="DirectStudy()" id="studiebtn" disabled>start Studie</button>
-        </div>
-        <p>Andere opties:</p>
-        <ul>
-            <li><a href="add.html">Kanji/Woord Toevoegen</a></li>
-            <li><a href="server.html">Server info</a></li>
-            <li><a href="addGroup.html">Voeg groep toe</a></li>
-            <li><a href="entryView.html">Zie alle invoeringen</a></li>
-        </ul>
+    <div id="menubalk">        
+        <li><a href="add.html">Kanji/Woord Toevoegen</a></li>
+        <li><a href="server.html">Server info</a></li>
+        <li><a href="addGroup.html">Voeg groep toe</a></li>
+        <li><a href="entryView.html">Zie alle invoeringen</a></li>
     </div>
-    
+    <div style="display: flex; flex-direction: column; justify-content: center; height: 100%;">
+        <div id="inhoud">
+            <div id="modeselecting" class="container">
+                <p>Selecteer je mode</p>
+                <select id="Kanjimode" onchange="nextModeEnable()" class="klikbaar">
+                    <option value=""></option>
+                    <option value="charakter_tabel">Kanji</option>
+                    <option value="woordenschat_tabel">Woordenschat</option>
+                </select><br>
+                <p>welke kolom opvragen?</p>
+                <select id="richtingmode" disabled class="klikbaar"></select><br>
+                <p>welke groep?</p>
+                <select id="groepen" disabled class="klikbaar"></select><br>
+                <button onclick="DirectStudy()" id="studiebtn" class="klikbaar" disabled>start Studie</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
+<style>
+    #inhoud{
+        display: flex;
+        justify-content:center;
+        flex-flow: row; 
+    }
+    p{
+        display: inline-block;
+        margin: 5px;
+    }
+</style>

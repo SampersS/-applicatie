@@ -1,0 +1,36 @@
+*{
+    margin:0px;
+    padding:0px;
+}
+html{
+    height: 100%;
+}
+body{
+    background-image: url(../fotos/bg.jpg);
+    height: 100%;
+}
+.klikbaar{
+    color: black;
+    border: 1px solid rgb(190, 190, 190);
+    border-radius: 0px;
+    background-color: #b0c7dc;
+    padding: 0.2em 2em 0.2em 2em;
+    box-shadow: inset 0px 10px 7px white;
+}
+.klikbaar:hover{
+    background-color: #81b9ee;
+}
+.klikbaar:disabled{
+    background-color: #bbbbbb;
+}
+.klikbaar:active.klikbaar:enabled{
+    background-color: rgb(47, 142, 231);
+}
+.inputveld{
+    border: 1px solid rgb(190, 190, 190);
+    font-size:medium;
+}
+.container{
+    background-color:rgba(242, 247, 255, 0.89);
+    padding: 10px;
+}

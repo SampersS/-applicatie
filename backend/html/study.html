@@ -124,6 +124,7 @@
         }
         const DisplayData = function(){
             document.getElementById("tabel").hidden = true
+            document.getElementById("veld1").style.color = "#000000"
             document.getElementById("veld1").value = currentQ[DisplayLinks.veld1];
             if(DisplayLinks.veld2 != undefined){
                 document.getElementById("veld2").value = currentQ[DisplayLinks.veld2];
@@ -182,32 +183,58 @@
         const rate = function(reslt){
             ReturnData[currentQ["id"]] = reslt
             mt = false
+            if(reslt=="goed"){
+                document.getElementById("veld1").style.color = "#00ff00"
+            }else{
+                document.getElementById("veld1").style.color = "#ff0000"
+            }
         }
     </script>
+    <link rel="stylesheet" href="css/algemeen.css">
 </head>
 <body onload="prepare()">
-    <div id="pwobj" hidden>
-        <label for="txtPassword">Wachtwoord:</label><br>
-        <input type="password" id="txtPassword"><br>
+    <div style="display: flex; flex-direction: row; justify-content: center; height: 100%;">
+        <div style="display: flex; flex-direction: column; justify-content: center; height: 100%;">
+            <div class="container">
+                <div id="pwobj" hidden>
+                    <label for="txtPassword">Wachtwoord:</label><br>
+                    <input type="password" id="txtPassword" class="inputveld"><br>
+                </div>
+                <form action="console.log('L')" id="ioform">
+                    <h2>Opvraging:</h2>
+                    <textarea id="veld1" readonly></textarea>
+                    <textarea id="veld2" readonly hidden></textarea>
+                    <img src="" alt="" id="handzuimg" hidden>
+                    <textarea id="Oploss1" readonly></textarea>
+                    <textarea id="Oploss2" readonly hidden></textarea>
+                    <textarea id="Oploss3" readonly hidden></textarea>
+                    <input type="button" onclick="ToonOploss()" id="btnOploss" value="Toon oplossing" class="klikbaar" disabled>
+                    <div style="display: flex;">
+                        <input type="button" onclick="rate('goed')" id="goodrate" class="btnRate klikbaar" disabled value="Goed">
+                        <input type="button" onclick="rate('fout')" id="badrate" class="btnRate klikbaar" disabled value="Fout">
+                    </div>
+                    <input type="button" onclick="displayNextQuestion()" id="btnNext" class="klikbaar" value="Volgende Vraag">
+                    <input type="button" onclick="returnResults()" id="btnSVE" class="klikbaar" value="save">
+                </form>
+                <table id="tabel" hidden>
+                    <tr>
+                        <th>Andere betekenissen:</th>
+                    </tr>
+                </table>
+            </div>
+        </div>
     </div>
-    <form action="console.log('L')" name="ioform">
-        <h1>Opvraging:</h1>
-        <textarea  id="veld1" readonly></textarea><br>
-        <textarea id="veld2" readonly hidden></textarea><br>
-        <img src="" alt="" id="handzuimg" hidden><br>
-        <textarea id="Oploss1" readonly></textarea><br>
-        <textarea id="Oploss2" readonly hidden></textarea><br>
-        <textarea id="Oploss3" readonly hidden></textarea><br>
-        <input type="button" onclick="ToonOploss()" id="btnOploss" value="Toon oplossing" disabled><br>
-        <input type="button" onclick="rate('goed')" id="goodrate" class="btnRate" disabled value="Goed">
-        <input type="button" onclick="rate('fout')" id="badrate" class="btnRate" disabled value="Fout"><br>
-        <input type="button" onclick="displayNextQuestion()" id="btnNext" value="Volgende Vraag"><br>
-        <input type="button" onclick="returnResults()" id="btnSVE" value="save"><br>
-    </form>
-    <table id="tabel" hidden>
-        <tr>
-            <th>Andere betekenissen:</th>
-        </tr>
-    </table>
 </body>
+<style>
+#ioform{
+    display: flex;
+    flex-direction: column;
+}
+#ioform > *{
+    margin: 5px;
+}
+.btnRate{
+    width:50%;
+}
+</style>
 </html>

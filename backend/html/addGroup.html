@@ -9,23 +9,36 @@
     <script src="./lib/rsa.js"></script>
     <script src="./lib/base64.js"></script>
     <script src="./lib/tools.js"></script>
+    <link rel="stylesheet" href="css/algemeen.css">
 </head>
 <body onload="prepare()">
-    <div id="pwobj" hidden>
-        <label for="txtPassword">Wachtwoord:</label><br>
-        <input type="password" id="txtPassword"><br>
+    <div style="display: flex; flex-direction: row; justify-content: center; height: 100%;">
+        <div style="display: flex; flex-direction: column; justify-content: center; height: 100%;">
+            <div class="container">
+                <div id="pwobj" hidden>
+                    <label for="txtPassword">Wachtwoord:</label><br>
+                    <input type="password" id="txtPassword" class="inputveld"><br>
+                </div>
+                <p style="margin: 0px;">Naam:</p>
+                <input type="text" id="txtnaam" class="inputveld"><br>
+                <button onclick="sendNew()" class="klikbaar">Voeg toe</button>
+                <button onclick="window.location.href = 'menu.html'" class="klikbaar">Terug</button><br>
+                <p style="margin: 0px;">Ingaven:</p>
+                <div style="
+                    max-height: 100px;
+                    overflow: auto;
+                ">
+                    <table id="tabel">
+                        <tr>
+                            <th>id</th>
+                            <th>naam</th>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
-    <p style="margin: 0px;">Naam:</p><br>
-    <input type="text" id="txtnaam"><br>
-    <button onclick="sendNew()">Voeg toe</button>
-    <button onclick="window.location.href = 'menu.html'">Terug</button><br>
-    <p style="margin: 0px;">Ingaven:</p>
-    <table id="tabel">
-        <tr>
-            <th>id</th>
-            <th>naam</th>
-        </tr>
-    </table>
+    
 </body>
 <script>
     const sendNew = function(){

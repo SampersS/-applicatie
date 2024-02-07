@@ -3,14 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
+    <link rel="stylesheet" href="css/algemeen.css">
 </head>
 <body onload="check()">
-    <div id="inlogForm">
-        <label for="txtPassword">Wachtwoord:</label><br>
-        <input type="password" id="txtPassword"><br>
-        <button type="button" onclick="validation()">Binnen gaan</button>
-        <p>Als je wachtwoord verkeerd is zal niets werken!</p>
+    <div style="display: flex; flex-direction: row; justify-content: center; height: 100%;">
+        <div style="display: flex; flex-direction: column; justify-content: center; height: 100%;">
+            <div id="inlogForm" class="container">
+                <label for="txtPassword">Wachtwoord:</label><br>
+                <input type="password" id="txtPassword" class="inputveld"><br>
+                <button type="button" onclick="validation()" class="klikbaar">Binnen gaan</button>
+                <p>Als je wachtwoord verkeerd is zal niets werken!</p>
+            </div>
+        </div>
     </div>
+
     <script>
         function validation(){
             sessionStorage.setItem("pw", document.getElementById("txtPassword").value);
@@ -23,4 +29,9 @@
         }
     </script>
 </body>
+<style>
+    button{
+        margin: 5px 0px;
+    }
+</style>
 </html>
