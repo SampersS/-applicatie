@@ -49,6 +49,14 @@
             }
             return true
         }
+        function chkData(input_array, max_array){
+            for(var i = 0; i < input_array.size; i++){
+                if(input_array[i].length == 0 || input_array[i].length > max_array[i]){
+                    return false;
+                }
+            }
+            return true;
+        }
         const sendData = function(){   
             var selecvalu = document.getElementById("Kanjimode").value;
             var groepElement = document.getElementById("groepen");
@@ -58,6 +66,14 @@
             var kanjigeschrevenElement = document.getElementById("txtKanjiWrite")
             var notitieElement = document.getElementById("txtNotitie")
             var fileInput = document.getElementById("file_input");
+            var arrind = 1
+            if(selecvalu == "charakter_tabel"){arrind = 0;if(fileInput.files.size==0){alert("slechte invoer!");return;}}
+            var maxsizes = [[30,50,4,45,45],[20,15,50,45]]
+            var chkdata = [[uitspraakElement.value,betekenisElement.value,charElement.value,fileInput.files[0],notitieElement.value],[uitspraakElement.value,kanjigeschrevenElement.value,betekenisElement.value,notitieElement.value]]
+            if(!chkData(chkdata[arrind],maxsizes[arrind])){
+                alert("slechte invoer!")
+                return;
+            }
             var urlparm = []
             urlparm["pad"] = ""
             if(notitieElement.value == "") {notitieElement.value = " "}
@@ -95,6 +111,20 @@
             }
             var http = new XMLHttpRequest();
             http.open('POST', serverAddress+apiAdditions+urlparm["ap"]+urlparm["pad"]);
+            http.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    if(http.responseText != "ok"){
+                        retobj = JSON.parse(http.responseText)
+                        if(retobj.error && retobj.error == "rand verkeerd"){
+                            alert("probeer opnieuw")
+                            getMeta()
+                        }
+                        else if(retobj.error){
+                            alert("er was een error")
+                        }
+                    }
+                }
+            };
             http.send(cryptograaf(urlparm["pad"], true));
             //window.location.href = "menu.html"
         }

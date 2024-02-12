@@ -101,7 +101,6 @@
                 cel5.appendChild(ch)
                 var im = document.createTextNode(data[index].img);
                 cel6.appendChild(im)
-
             }else{
                 id_nr = data[index].idwoordenschat_tabel
                 id = document.createTextNode(data[index].idwoordenschat_tabel);
@@ -120,12 +119,12 @@
             cel7.appendChild(nt)
             var bt = document.createElement("BUTTON");
             bt.appendChild(document.createTextNode("verwijder"));
-            bt.addEventListener("click", function(){Delete(id_nr,index+ExtraRows)});
+            bt.addEventListener("click", Delete.bind(this,id_nr,ExtraRows+index));
             cel8.appendChild(bt)
         }
     }
     const Delete = function(id, index){
-        console.log("te verwijderen:",index)
+        console.log("te verwijderen:",index, id)
         var xhttp = new XMLHttpRequest();
         var element = document.getElementById("Kanjimode")
         var tabelElement = document.getElementById("tabel")

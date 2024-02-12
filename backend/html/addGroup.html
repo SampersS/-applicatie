@@ -43,13 +43,13 @@
 <script>
     const sendNew = function(){
         var naam = document.getElementById("txtnaam").value
-        if(naam != ""){
+        if(naam != "" || naam.lenght > 45){
             var url = serverAddress+apiAdditions+"addGroup/"+naam
             var http = new XMLHttpRequest();
             http.open('POST', url, false);
             http.send(cryptograaf(naam, false))
         }else{
-            alert("je moet wel een naam invullen hé")
+            alert("ongeldige invoer")
         }
     }
     const prepare = function(){

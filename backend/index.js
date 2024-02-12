@@ -1,5 +1,5 @@
 const express = require("express")
-const port = 80
+const port = 3000
 const databasehelper = require("./db")
 const util = require("util")
 const fileHelper = require("./fileHelper.js")

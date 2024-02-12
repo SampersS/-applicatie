@@ -59,6 +59,14 @@
                 document.getElementById("Oploss2").hidden = false
             }
             getMeta()
+            window.addEventListener('beforeunload', function (e) {
+                if (mt == false) {
+                    // Cancel the event and show alert that
+                    // the unsaved changes would be lost
+                    e.preventDefault();
+                    e.returnValue = '';
+                }
+            });
         }
         const getNewQuestions = function(cb){
             GetDataPost(serverAddress+apiAdditions+"generate100/"+groepid+"/"+tabel+"/"+colom,function(ret){
@@ -204,7 +212,9 @@
                     <h2>Opvraging:</h2>
                     <textarea id="veld1" readonly></textarea>
                     <textarea id="veld2" readonly hidden></textarea>
-                    <img src="" alt="" id="handzuimg" hidden>
+                    <div>
+                        <img src="" alt="" id="handzuimg" hidden>
+                    </div>
                     <textarea id="Oploss1" readonly></textarea>
                     <textarea id="Oploss2" readonly hidden></textarea>
                     <textarea id="Oploss3" readonly hidden></textarea>
