@@ -138,6 +138,43 @@ const QuestionReturn = (req, res,tabel,mode) => {
             hoeveelheid++;
         }
         res.status(200).json({"ontvangen":hoeveelheid});
+
+        //update van activiteit van de gebruiker
+        let row = ""
+        if(tabel == "woordenschat_tabel"){
+            if(mode == "uitspraak"){
+                row = "wnu"
+            }else{
+                row = "wnb"
+            }
+        }else{
+            if(mode == "teken"){
+                row = "knt"
+            }else{
+                row = "knb"
+            }
+        }
+        const data = await new Promise((resolve, reject) => {
+            const select = "select * from activiteit_tabel where dag = DATE(NOW())"
+            let query = connection.query(select, (err,data) => {
+                if(err) return reject(err);
+                resolve(data);
+            });
+        });
+        let newQuerry
+        if(data.length == 0){
+            newQuerry = "insert into activiteit_tabel (dag,??) values(DATE(NOW()),?)"
+        }else{
+            hoeveelheid += data[0][row];
+            newQuerry = "update activiteit_tabel set ??=? where dag = DATE(NOW())"
+        }
+        const lala = await new Promise((resolve, reject) => {
+            const select = newQuerry
+            let query = connection.query(select,[row, hoeveelheid], (err,data) => {
+                if(err) return reject(err);
+                resolve(data);
+            });
+        });
         connection.end()
     })
 }
