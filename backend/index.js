@@ -80,13 +80,11 @@ app.post("/backend/getEntries/:table",(req,res)=>{ //#
     databasehelper.GetAllEntries(req,res,req.params.table)
   }
 })
-/* app.post("/backend/zelfdeUitspraak/:uitspraak",(req,res)=>{
-  if(VraagendIP != auth.getIP(req)){
-    res.sendStatus(401)
-    return;
+app.post("/backend/getActivity/:beginDatum/:eindDatum/:sprong",(req, res)=>{
+  if(auth.Validate(req,res,req.body,req.params.beginDatum+req.params.eindDatum+req.params.sprong)){
+    databasehelper.GetActivity(req,res,req.params.beginDatum,req.params.eindDatum,req.params.sprong)
   }
-  databasehelper.GetSameVocab(req,res,req.params.uitspraak)
-}) */
+})
 app.post("/backend/KeyRandom",(req, res)=>{
   auth.GetRandomModulus(req,res)
 })

@@ -8,7 +8,8 @@ let configConnect = (returnCode) => {
         user: global.__dbuser,
         password: global.__dbpass,
         database: global.__database,
-        multipleStatements: true
+        multipleStatements: true,
+        dateStrings: true
     });
     connection.connect(error => {
         if(error){
@@ -341,17 +342,17 @@ const GetAllEntries = (req, res,tableName) => {
         connection.end()
     })
 }
-const GetSameVocab = (req, res, uitspraak) => {
+const GetActivity = (req, res,beginDatum, eindDatum, sprong) => {//datums in yyyy-MM-dd
     configConnect(function(connection){
-        const queryry = "select * from woordenschat_tabel where romaji_uitspraak=?"
-        connection.query(queryry,[uitspraak], (err, data) => {
+        const queryry = "select dag as 1steDag, FLOOR(((dag-Date('1970-01-01'))-(DATE(?)-Date('1970-01-01')))/?) as dagGroep, SUM(knt) as sknt,SUM(knb) as sknb,SUM(wnb) as swnb,SUM(wnu) as swnu from activiteit_tabel where dag<=DATE(?) Group by dagGroep;"
+        connection.query(queryry,[beginDatum, sprong, eindDatum], (err, data) => {
             if(err){
                 res.set({
                     "CacheControl":"no-cache",
                     "Pragma":"no-cache",
                     "Expires":"-1"
-                  }).status(404).send({error:'sou da warui no jibun janai'})
-                console.log(err.message)
+                  }).status(404).send({error:'baka'})
+                console.log("er was een error")
             }else{
                 //console.log('the query answer is: ', data);
                 res.set({
@@ -364,4 +365,4 @@ const GetSameVocab = (req, res, uitspraak) => {
         connection.end()
     })
 }
-module.exports = {ServerGenerate100Questions, QuestionReturn,PostWoord, PostKanji, GetGroups, AddGroup, DeleteGroup, RemoveKanji, RemoveWord, GetAllEntries, GetSameVocab}
+module.exports = {ServerGenerate100Questions, QuestionReturn,PostWoord, PostKanji, GetGroups, AddGroup, DeleteGroup, RemoveKanji, RemoveWord, GetAllEntries,GetActivity}

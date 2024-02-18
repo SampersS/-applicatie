@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>チルノバカ</title>
+    <link rel="stylesheet" href="css/algemeen.css">
+    <script src="./lib/prng4.js"></script>
+    <script src="./lib/rng.js"></script>
+    <script src="./lib/jsbn.js"></script>
+    <script src="./lib/rsa.js"></script>
+    <script src="./lib/base64.js"></script>
+    <script src="./lib/tools.js"></script>
+</head>
+<body onload="PreparePassword();getMeta()">
+    <div style="display: flex; flex-direction: column; justify-content: center; height: 100%;">
+        <div style="display: flex; flex-direction: row; justify-content: center;">
+            <div class="container" style="max-width: 90%;">
+                <h1>Activiteit</h1>
+                <h3>Periode:</h3>
+                <table>
+                    <tr>
+                        <td>start datum:</td>
+                        <td>eind datum:</td>
+                        <td>dagen per datapunt:</td>
+                    </tr>
+                    <tr>
+                        <td><input type="date" id="dateStart"></td>
+                        <td><input type="date" id="dateEind"></td>
+                        <td><input type="number" id="txtSprong"></td>
+                    </tr>
+                </table>
+                <input type="button" value="Genereer" class="klikbaar" onclick="generate()">
+                <div style="background: white; display: flex; flex-direction: row; height: 225px; overflow: auto; margin-top: 5px;" id="grafiek">
+
+                </div>
+                <p>kanji naar teken = blauw</p>
+                <p>kanji naar betekenis = groen</p>
+                <p>woordenschat naar uitspraak = rood</p>
+                <p>woordenschat naar betekenis = oranje</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+<script>
+    function generate(){
+        var eStartDT = document.getElementById("dateStart")
+        var eEindDT = document.getElementById("dateEind")
+        var eSprong = document.getElementById("txtSprong")
+        console.log(eStartDT.value, eEindDT.value, eSprong.value)
+        GetDataPost(serverAddress+apiAdditions+"getActivity/"+eStartDT.value+"/"+eEindDT.value+"/"+eSprong.value,function(ret){
+            if(ret.error == "rand verkeerd"){
+                getMeta(generate)
+                return;
+            }
+            var cols = ["sknt","sknb","swnu","swnb"]
+            var maxing = [0,0,0,0]
+            for(var i = 0; i <ret.length; i++){
+                for(var j = 0; j < maxing.length; j++){
+                    if(maxing[j] < ret[i][cols[j]]){
+                        maxing[j] = ret[i][cols[j]]
+                    }
+                }
+            }
+            var grf = document.getElementById("grafiek")
+            while(grf.firstChild){
+                    grf.removeChild(grf.firstChild);
+                }
+            for(var i = 0; i <ret.length; i++){
+                var prdiv = document.createElement("div")
+                var updiv = document.createElement("div")
+                var downdiv = document.createElement("div")
+                downdiv.style.width = "40px";
+                downdiv.style.height = "25px";
+                prdiv.style.marginLeft = "20px"
+                updiv.style.display = "flex"
+                updiv.style.flexDirection = "row"
+                updiv.style.height = "200px"
+                var divers = [document.createElement("div"),document.createElement("div"),document.createElement("div"),document.createElement("div")]
+                divers[0].style.background = "blue"
+                divers[1].style.background = "green"
+                divers[2].style.background = "red"
+                divers[3].style.background = "orange"
+                for(var j = 0; j < divers.length;j++){
+                    divers[j].style.height = ((ret[i][cols[j]]/maxing[j])*200)+"px"
+                    divers[j].style.marginTop = "auto"
+                    if(maxing[j]==0){
+                        divers[j].style.height = "0px"
+                    }
+                    divers[j].style.width = "10px"
+                    updiv.appendChild(divers[j])
+                }
+                downdiv.appendChild(document.createTextNode(ret[i]["1steDag"].substring(ret[i]["1steDag"].indexOf('-')+1)))
+                prdiv.appendChild(updiv)
+                prdiv.appendChild(downdiv)
+                grf.appendChild(prdiv)
+            }
+        },cryptograaf(eStartDT.value+eEindDT.value+eSprong.value, false))
+    }
+</script>
+<style>
+    table{
+        border-spacing: 8px;
+    }
+    input[type=number]{
+        width: 40px;
+        height: 20px;
+    }
+</style>
