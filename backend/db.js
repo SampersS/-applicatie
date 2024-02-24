@@ -344,8 +344,8 @@ const GetAllEntries = (req, res,tableName) => {
 }
 const GetActivity = (req, res,beginDatum, eindDatum, sprong) => {//datums in yyyy-MM-dd
     configConnect(function(connection){
-        const queryry = "select dag as 1steDag, FLOOR(((dag-Date('1970-01-01'))-(DATE(?)-Date('1970-01-01')))/?) as dagGroep, SUM(knt) as sknt,SUM(knb) as sknb,SUM(wnb) as swnb,SUM(wnu) as swnu from activiteit_tabel where dag<=DATE(?) Group by dagGroep;"
-        connection.query(queryry,[beginDatum, sprong, eindDatum], (err, data) => {
+        const queryry = "select dag as 1steDag, FLOOR(((dag-Date('1970-01-01'))-(DATE(?)-Date('1970-01-01')))/?) as dagGroep, SUM(knt) as sknt,SUM(knb) as sknb,SUM(wnb) as swnb,SUM(wnu) as swnu from activiteit_tabel where dag<=DATE(?) and dag>=DATE(?) Group by dagGroep;"
+        connection.query(queryry,[beginDatum, sprong, eindDatum, beginDatum], (err, data) => {
             if(err){
                 res.set({
                     "CacheControl":"no-cache",

@@ -24,13 +24,13 @@
                         <td>dagen per datapunt:</td>
                     </tr>
                     <tr>
-                        <td><input type="date" id="dateStart"></td>
-                        <td><input type="date" id="dateEind"></td>
-                        <td><input type="number" id="txtSprong"></td>
+                        <td><input type="date" id="dateStart" onchange="chkEnable()"></td>
+                        <td><input type="date" id="dateEind" onchange="chkEnable()"></td>
+                        <td><input type="number" id="txtSprong" onchange="chkEnable()"></td>
                     </tr>
                 </table>
-                <input type="button" value="Genereer" class="klikbaar" onclick="generate()">
-                <div style="background: white; display: flex; flex-direction: row; height: 225px; overflow: auto; margin-top: 5px;" id="grafiek">
+                <input type="button" value="Genereer" class="klikbaar" id="btnStart" onclick="generate()" disabled>
+                <div style="background: white; display: flex; flex-direction: row; height: 250px; overflow: auto; margin-top: 5px;" id="grafiek">
 
                 </div>
                 <p>kanji naar teken = blauw</p>
@@ -71,7 +71,7 @@
                 var updiv = document.createElement("div")
                 var downdiv = document.createElement("div")
                 downdiv.style.width = "40px";
-                downdiv.style.height = "25px";
+                downdiv.style.height = "50px";
                 prdiv.style.marginLeft = "20px"
                 updiv.style.display = "flex"
                 updiv.style.flexDirection = "row"
@@ -96,6 +96,14 @@
                 grf.appendChild(prdiv)
             }
         },cryptograaf(eStartDT.value+eEindDT.value+eSprong.value, false))
+    }
+    function chkEnable(){
+        var a = document.getElementById("dateStart")
+        var b = document.getElementById("dateEind")
+        var c = document.getElementById("txtSprong")
+        if(a.value != "" && b.value != "" && c.value !=""){
+            document.getElementById("btnStart").disabled = false;
+        }
     }
 </script>
 <style>
