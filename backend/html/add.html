@@ -3,11 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>add html</title>
-    <script src="./lib/prng4.js"></script>
-    <script src="./lib/rng.js"></script>
-    <script src="./lib/jsbn.js"></script>
-    <script src="./lib/rsa.js"></script>
-    <script src="./lib/base64.js"></script>
     <script src="./lib/tools.js"></script>
     <script>
         var Image = null
@@ -37,8 +32,7 @@
                     groepElement.add( option );
                     console.log(data[index])
                 }
-                getMeta();
-            })
+            },true)
         }
         function VeNiLe(classname){
             var elms = document.getElementsByClassName(classname)
@@ -89,8 +83,8 @@
                     var formData = new FormData();
                     formData.append('file', fileInput.files[0]);
                     var http = new XMLHttpRequest();
-                    var url = serverAddress+apiIMGAdditions+fileInput.files[0].size;
-                    http.open('POST', url+"/"+cryptograaf(fileInput.files[0].size, false), false);
+                    var url = serverAddress+apiIMGAdditions
+                    http.open('POST', url+getPassword(), false);
                     http.send(formData);
                 }else{
                     alert("onvolledige invoer")
@@ -110,14 +104,13 @@
                 }
             }
             var http = new XMLHttpRequest();
-            http.open('POST', serverAddress+apiAdditions+urlparm["ap"]+urlparm["pad"]);
+            http.open('POST', serverAddress+apiAdditions+urlparm["ap"]+urlparm["pad"]+getPassword());
             http.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
                     if(http.responseText != "ok"){
                         retobj = JSON.parse(http.responseText)
                         if(retobj.error && retobj.error == "rand verkeerd"){
                             alert("probeer opnieuw")
-                            getMeta()
                         }
                         else if(retobj.error){
                             alert("er was een error")
@@ -125,7 +118,7 @@
                     }
                 }
             };
-            http.send(cryptograaf(urlparm["pad"], true));
+            http.send();
             //window.location.href = "menu.html"
         }
         </script>

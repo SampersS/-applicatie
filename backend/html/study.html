@@ -3,11 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Pagina 2</title>
-    <script src="./lib/prng4.js"></script>
-    <script src="./lib/rng.js"></script>
-    <script src="./lib/jsbn.js"></script>
-    <script src="./lib/rsa.js"></script>
-    <script src="./lib/base64.js"></script>
     <script src="./lib/tools.js"></script>
     <script>
         var tabel = ""
@@ -58,7 +53,6 @@
                 }
                 document.getElementById("Oploss2").hidden = false
             }
-            getMeta()
             window.addEventListener('beforeunload', function (e) {
                 if (mt == false) {
                     // Cancel the event and show alert that
@@ -70,10 +64,6 @@
         }
         const getNewQuestions = function(cb){
             GetDataPost(serverAddress+apiAdditions+"generate100/"+groepid+"/"+tabel+"/"+colom,function(ret){
-                    if(ret.error == "rand verkeerd"){
-                        getMeta(getNewQuestions)
-                        return;
-                    }
                     OpgevraagdeData = ret
                     listIndex = 0;
                     if(ret.length>100){
@@ -85,7 +75,7 @@
                     if(cb){
                         cb()
                     }
-                },cryptograaf(groepid+tabel+colom, false))
+                })
         }
         const returnResults = function(cb, args){
             if(mt){
@@ -100,20 +90,14 @@
                 if (this.readyState == 4 && this.status == 200) {
                     console.log(httpp.responseText)
                     var parsed = JSON.parse(httpp.responseText)
-                    if(parsed.error == "rand verkeerd"){
-                        getMeta(returnResults)
-                    }else if(parsed.error == 401){
-                        console.log("(*)(*)")
-                    }else{
                         ReturnData = {}
                         mt = true
                         if(cb){
                             cb(args)
                         }
-                    }
                 }
             };
-            var url = serverAddress+apiAdditions+"returnResult/"+tabel+"/"+colom+"/"+cryptograaf(tabel+colom, false)
+            var url = serverAddress+apiAdditions+"returnResult/"+tabel+"/"+colom+"/"+getPassword()
             httpp.open('POST', url, false);
             httpp.send(JSON.stringify(ReturnData));
         }

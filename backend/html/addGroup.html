@@ -3,11 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Document</title>
-    <script src="./lib/prng4.js"></script>
-    <script src="./lib/rng.js"></script>
-    <script src="./lib/jsbn.js"></script>
-    <script src="./lib/rsa.js"></script>
-    <script src="./lib/base64.js"></script>
     <script src="./lib/tools.js"></script>
     <link rel="stylesheet" href="css/algemeen.css">
 </head>
@@ -44,10 +39,11 @@
     const sendNew = function(){
         var naam = document.getElementById("txtnaam").value
         if(naam != "" || naam.lenght > 45){
-            var url = serverAddress+apiAdditions+"addGroup/"+naam
+            var url = serverAddress+apiAdditions+"addGroup/"+naam+"/"+getPassword()
             var http = new XMLHttpRequest();
             http.open('POST', url, false);
-            http.send(cryptograaf(naam, false))
+            http.send()
+            //fetch(url, {method: "post"})
         }else{
             alert("ongeldige invoer")
         }
@@ -67,8 +63,7 @@
                 cel1.appendChild(id)
                 cel2.appendChild(naam)
             }
-            getMeta()
-        })
+        }, true)
     }
 </script>
 </html>

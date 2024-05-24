@@ -3,14 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Document</title>
-    <script src="./lib/prng4.js"></script>
-    <script src="./lib/rng.js"></script>
-    <script src="./lib/jsbn.js"></script>
-    <script src="./lib/rsa.js"></script>
-    <script src="./lib/base64.js"></script>
     <script src="./lib/tools.js"></script>
 </head>
-<body onload="PreparePassword();getMeta()">
+<body onload="PreparePassword()">
     <div id="pwobj" hidden>
         <label for="txtPassword">Wachtwoord:</label><br>
         <input type="password" id="txtPassword"><br>
@@ -63,7 +58,7 @@
         GetDataPost(serverAddress+apiAdditions+"getEntries/"+element.value, function(data){
             curData = data
             RefreshList()
-        },cryptograaf(element.value, false))
+        })
     }
     const RefreshList = function(){
         var data = curData
@@ -132,14 +127,14 @@
         if(element.value == "charakter_tabel"){
             url += "deleteKanji/"
             var xhttp2 = new XMLHttpRequest();
-            xhttp2.open("DELETE", serverAddress+apiIMGAdditions+tabelElement.rows[index].cells[5].textContent ,true);
-            xhttp2.send(cryptograaf(tabelElement.rows[index].cells[5].textContent , false));
+            xhttp2.open("DELETE", serverAddress+apiIMGAdditions+tabelElement.rows[index].cells[5].textContent+"/"+getPassword() ,true);
+            xhttp2.send();
         }else{
             url += "deleteWoord/"
         }
-        url += id
+        url += id + "/" + getPassword()
         xhttp.open("DELETE", url, true);
-        xhttp.send(cryptograaf(id, false));
+        xhttp.send();
         curData.splice(index-ExtraRows,1)
         RefreshList()
     }

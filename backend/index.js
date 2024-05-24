@@ -1,12 +1,14 @@
 const express = require("express")
-const port = 3000
+const port = 443
 const databasehelper = require("./db")
 const util = require("util")
 const fileHelper = require("./fileHelper.js")
 const cors = require("cors")
 const auth = require("./autenticatie.js")
+const https = require("https")
 const routines = require("./routines.js")
 const dotenv = require("dotenv")
+const fs = require('fs')
 
 dotenv.config();
 global.__dbhost = process.env.DB_HOST;
@@ -31,65 +33,62 @@ app.post('/backend/', (req, res) => {
   }).send('Verbinding met de backend is werkend!')
   console.log("gotten")
 })
-app.post("/backend/generate100/:groupid/:kanjidb/:mode", (req, res) => { //#
-  if(auth.Validate(req,res,req.body,req.params.groupid + req.params.kanjidb + req.params.mode)){
+app.post("/backend/generate100/:groupid/:kanjidb/:mode/:pw", (req, res) => { //#
+  if(auth.Validate(req,res,req.params.pw)){
     VraagendIP = auth.getIP(req);
     databasehelper.ServerGenerate100Questions(req, res, req.params["groupid"], req.params["kanjidb"], req.params["mode"])
   }
 })
-app.post("/backend/returnResult/:db/:mode/*", (req, res) => { //#
-  if(auth.Validate(req,res,routines.extracUrlPart(req.originalUrl,5),req.params.db + req.params.mode)){
+app.post("/backend/returnResult/:db/:mode/:pw", (req, res) => { //#
+  if(auth.Validate(req,res,req.params.pw)){
     databasehelper.QuestionReturn(req, res, req.params.db,req.params.mode)
   }
 })
-app.post("/backend/postWoord/:groepid/:uitspraak/:kanji/:betekenis/:notitie", (req, res) => { //#
-    if(auth.Validate(req,res,req.body,req.params.groepid + req.params.uitspraak + req.params.kanji + req.params.betekenis + req.params.notitie)){
+app.post("/backend/postWoord/:groepid/:uitspraak/:kanji/:betekenis/:notitie/:pw", (req, res) => { //#
+    if(auth.Validate(req,res,req.params.pw)){
       databasehelper.PostWoord(req, res, req.params.groepid,req.params.uitspraak,req.params.kanji,req.params.betekenis,req.params.notitie)
     }
 })
-app.post("/backend/postKanji/:groepid/:uitspraak/:betekenis/:kanji/:img/:notitie", (req, res) => { //#
-  if(auth.Validate(req,res,req.body,req.params.groepid + req.params.uitspraak + req.params.betekenis + req.params.kanji + req.params.img + req.params.notitie)){
+app.post("/backend/postKanji/:groepid/:uitspraak/:betekenis/:kanji/:img/:notitie/:pw", (req, res) => { //#
+  if(auth.Validate(req,res,req.params.pw)){
     databasehelper.PostKanji(req, res, req.params.groepid,req.params.uitspraak,req.params.betekenis,req.params.kanji,req.params.img,req.params.notitie)
   }
 })
 app.post("/backend/getGroups",(req,res)=>{
   databasehelper.GetGroups(req,res)
 })
-app.post("/backend/addGroup/:name",(req,res)=>{ //#
-  if(auth.Validate(req,res,req.body,req.params.name)){
+app.post("/backend/addGroup/:name/:pw",(req,res)=>{ //#
+  if(auth.Validate(req,res,req.params.pw)){
     databasehelper.AddGroup(req,res,req.params.name)
   }
 })
-app.delete("/backend/deleteGroup/:id",(req,res)=>{ //#
-  if(auth.Validate(req,res,req.body,req.params.id)){
+app.delete("/backend/deleteGroup/:id/:pw",(req,res)=>{ //#
+  if(auth.Validate(req,res,req.params.pw)){
     databasehelper.DeleteGroup(req,res,req.params.id)
   }
 })
-app.delete("/backend/deleteWoord/:id",(req,res)=>{ //#
-  if(auth.Validate(req,res,req.body,req.params.id)){
+app.delete("/backend/deleteWoord/:id/:pw",(req,res)=>{ //#
+  if(auth.Validate(req,res,req.params.pw)){
     databasehelper.RemoveWord(req,res,req.params.id)
   }
 })
-app.delete("/backend/deleteKanji/:id",(req,res)=>{ //#
-  if(auth.Validate(req,res,req.body,req.params.id)){
+app.delete("/backend/deleteKanji/:id/:pw",(req,res)=>{ //#
+  if(auth.Validate(req,res,req.params.pw)){
     databasehelper.RemoveKanji(req,res,req.params.id)
   }
 })
-app.post("/backend/getEntries/:table",(req,res)=>{ //#
-  if(auth.Validate(req,res,req.body,req.params.table)){
+app.post("/backend/getEntries/:table/:pw",(req,res)=>{ //#
+  if(auth.Validate(req,res,req.params.pw)){
     databasehelper.GetAllEntries(req,res,req.params.table)
   }
 })
-app.post("/backend/getActivity/:beginDatum/:eindDatum/:sprong",(req, res)=>{
-  if(auth.Validate(req,res,req.body,req.params.beginDatum+req.params.eindDatum+req.params.sprong)){
+app.post("/backend/getActivity/:beginDatum/:eindDatum/:sprong/:pw",(req, res)=>{
+  if(auth.Validate(req,res,req.params.pw)){
     databasehelper.GetActivity(req,res,req.params.beginDatum,req.params.eindDatum,req.params.sprong)
   }
 })
-app.post("/backend/KeyRandom",(req, res)=>{
-  auth.GetRandomModulus(req,res)
-})
-app.post("/backendIMG/:size/*", async (req, res) => { //alleen hier rsa string in de url omdat body = image
-  if(auth.Validate(req,res,routines.extracUrlPart(req.originalUrl,3),req.params.size)){
+app.post("/backendIMG/:pw", async (req, res) => { //alleen hier rsa string in de url omdat body = image
+  if(auth.Validate(req,res,req.params.pw)){
     try{
       await util.promisify(fileHelper.upload.single("file"))(req , res);
       if(req.file == undefined){
@@ -109,8 +108,8 @@ app.get("/backendIMG/:id", (req, res) => {
   }
   fileHelper.sendFile(req, res)
 })
-app.delete("/backendIMG/:id", (req, res) => { //#
-  if(auth.Validate(req,res,req.body,req.params.id)){
+app.delete("/backendIMG/:id/:pw", (req, res) => { //#
+  if(auth.Validate(req,res,req.params.pw)){
     fileHelper.deleteFile(req,res)
   }
 })
@@ -118,6 +117,12 @@ app.get("/html/*", (req, res) => {
    console.log(global.__dirname+"/html/"+routines.extracUrlPart(req.originalUrl,2).split('?')[0])
    res.sendFile(global.__dirname+"/html/"+routines.extracUrlPart(req.originalUrl,2).split('?')[0])
 })
-app.listen(port, () => {
-  console.log(`Backend app listening on port ${port}`)
-})
+
+var privateKey = fs.readFileSync( 'ssl/selfsigned.key' );
+var certificate = fs.readFileSync( 'ssl/selfsigned.crt');
+//sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ssl/selfsigned.key -out ssl/selfsigned.crt
+https.createServer({
+    key: privateKey,
+    cert: certificate
+}, app).listen(port);
+console.log(`Backend app listening on port ${port}`)

@@ -4,14 +4,9 @@
     <meta charset="UTF-8">
     <title>チルノバカ</title>
     <link rel="stylesheet" href="css/algemeen.css">
-    <script src="./lib/prng4.js"></script>
-    <script src="./lib/rng.js"></script>
-    <script src="./lib/jsbn.js"></script>
-    <script src="./lib/rsa.js"></script>
-    <script src="./lib/base64.js"></script>
     <script src="./lib/tools.js"></script>
 </head>
-<body onload="PreparePassword();getMeta()">
+<body onload="PreparePassword()">
     <div style="display: flex; flex-direction: column; justify-content: center; height: 100%;">
         <div style="display: flex; flex-direction: row; justify-content: center;">
             <div class="container" style="max-width: 90%;">
@@ -49,10 +44,6 @@
         var eSprong = document.getElementById("txtSprong")
         console.log(eStartDT.value, eEindDT.value, eSprong.value)
         GetDataPost(serverAddress+apiAdditions+"getActivity/"+eStartDT.value+"/"+eEindDT.value+"/"+eSprong.value,function(ret){
-            if(ret.error == "rand verkeerd"){
-                getMeta(generate)
-                return;
-            }
             var cols = ["sknt","sknb","swnu","swnb"]
             var maxing = [0,0,0,0]
             for(var i = 0; i <ret.length; i++){
@@ -95,7 +86,7 @@
                 prdiv.appendChild(downdiv)
                 grf.appendChild(prdiv)
             }
-        },cryptograaf(eStartDT.value+eEindDT.value+eSprong.value, false))
+        })
     }
     function chkEnable(){
         var a = document.getElementById("dateStart")
