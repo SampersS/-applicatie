@@ -114,8 +114,11 @@ app.delete("/backendIMG/:id/:pw", (req, res) => { //#
   }
 })
 app.get("/html/*", (req, res) => {
-   console.log(global.__dirname+"/html/"+routines.extracUrlPart(req.originalUrl,2).split('?')[0])
-   res.sendFile(global.__dirname+"/html/"+routines.extracUrlPart(req.originalUrl,2).split('?')[0])
+   let pad = global.__dirname+"/html/"+routines.extracUrlPart(req.originalUrl,2).split('?')[0]
+   console.log(pad)
+   if(!pad.includes("..")){
+      res.sendFile(global.__dirname+"/html/"+routines.extracUrlPart(req.originalUrl,2).split('?')[0])
+   }
 })
 
 var privateKey = fs.readFileSync( 'ssl/selfsigned.key' );
