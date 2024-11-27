@@ -344,8 +344,16 @@ const GetAllEntries = (req, res,tableName) => {
 }
 const GetActivity = (req, res,beginDatum, eindDatum, sprong) => {//datums in yyyy-MM-dd
     configConnect(function(connection){
-        const queryry = "select DATE_ADD(?, INTERVAL ?*FLOOR(DATEDIFF(dag,DATE(?))/?) DAY) as dagGroep, SUM(knt) as sknt,SUM(knb) as sknb,SUM(wnb) as swnb,SUM(wnu) as swnu from activiteit_tabel where dag<=DATE(?) and dag>=DATE(?) Group by dagGroep;"
-        connection.query(queryry,[beginDatum, sprong, beginDatum, sprong, eindDatum, beginDatum], (err, data) => {
+        var queryry;
+        var parameters;
+        if(sprong == 0){ //per maand
+            queryry = "select CONCAT(YEAR(dag), "/", MONTH(dag)) as dagGroep, SUM(knt) as sknt,SUM(knb) as sknb,SUM(wnb) as swnb,SUM(wnu) as swnu from activiteit_tabel where dag<=DATE(?) and dag>=DATE(?) Group by dagGroep;"
+            parameters = [eindDatum, beginDatum]
+        }else{
+            queryry = "select DATE_ADD(?, INTERVAL ?*FLOOR(DATEDIFF(dag,DATE(?))/?) DAY) as dagGroep, SUM(knt) as sknt,SUM(knb) as sknb,SUM(wnb) as swnb,SUM(wnu) as swnu from activiteit_tabel where dag<=DATE(?) and dag>=DATE(?) Group by dagGroep;"
+            parameters = [beginDatum, sprong, beginDatum, sprong, eindDatum, beginDatum]
+        }
+        connection.query(queryry,parameters, (err, data) => {
             if(err){
                 res.set({
                     "CacheControl":"no-cache",

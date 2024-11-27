@@ -82,7 +82,7 @@ app.post("/backend/getEntries/:table/:pw",(req,res)=>{ //#
     databasehelper.GetAllEntries(req,res,req.params.table)
   }
 })
-app.post("/backend/getActivity/:beginDatum/:eindDatum/:sprong/:pw",(req, res)=>{
+app.post("/backend/getActivity/:beginDatum/:eindDatum/:sprong/:pw",(req, res)=>{ //sprong == 0: per maand
   if(auth.Validate(req,res,req.params.pw)){
     databasehelper.GetActivity(req,res,req.params.beginDatum,req.params.eindDatum,req.params.sprong)
   }
