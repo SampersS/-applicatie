@@ -344,10 +344,10 @@ const GetAllEntries = (req, res,tableName) => {
 }
 const GetActivity = (req, res,beginDatum, eindDatum, sprong) => {//datums in yyyy-MM-dd
     configConnect(function(connection){
-        var queryry;
-        var parameters;
+        let queryry;
+        let parameters;
         if(sprong == 0){ //per maand
-            queryry = "select CONCAT(YEAR(dag), "/", MONTH(dag)) as dagGroep, SUM(knt) as sknt,SUM(knb) as sknb,SUM(wnb) as swnb,SUM(wnu) as swnu from activiteit_tabel where dag<=DATE(?) and dag>=DATE(?) Group by dagGroep;"
+            queryry = "select CONCAT(YEAR(dag), '/', MONTH(dag)) as dagGroep, YEAR(dag)*12+MONTH(dag) as sortering, SUM(knt) as sknt, SUM(knb) as sknb, SUM(wnb) as swnb, SUM(wnu) as swnu from activiteit_tabel where dag<=DATE(?) and dag>=DATE(?) Group by dagGroep order by sortering;"
             parameters = [eindDatum, beginDatum]
         }else{
             queryry = "select DATE_ADD(?, INTERVAL ?*FLOOR(DATEDIFF(dag,DATE(?))/?) DAY) as dagGroep, SUM(knt) as sknt,SUM(knb) as sknb,SUM(wnb) as swnb,SUM(wnu) as swnu from activiteit_tabel where dag<=DATE(?) and dag>=DATE(?) Group by dagGroep;"
