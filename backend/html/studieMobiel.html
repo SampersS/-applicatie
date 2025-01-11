@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <title>Pagina 2</title>
+    <script src="./lib/tools.js"></script>
+    <script>
+        var tabel = ""
+        var groepid = ""
+        var colom = ""
+        var listIndex = 0
+        var DisplayLinks = {}
+        var OplossingLinks = {}
+        var OpgevraagdeData = []
+        var ReturnData = {}
+        var mt = true;
+        var currentQ = {}
+        function prepare() {
+            PreparePassword()
+            var urldata = window.location.search.split("?")
+            console.log(urldata[1])
+            tabel = urldata[1];
+            colom = urldata[2];
+            groepid = urldata[3];
+            if(tabel == "charakter_tabel"){
+                if(colom == "teken"){
+                    DisplayLinks.veld1 = "ui"
+                    DisplayLinks.veld2 = "be"
+                    OplossingLinks.handzuimg = "im"
+                    OplossingLinks.Oploss1 = "no"
+                    document.getElementById("veld2").hidden = false
+                }else{
+                    DisplayLinks.veld1 = "ui"
+                    DisplayLinks.handzuimg = "im"
+                    OplossingLinks.Oploss1 = "be"
+                    OplossingLinks.Oploss2 = "no"
+                    document.getElementById("Oploss2").hidden = false
+                }
+                document.getElementById("handzuimg").hidden = false;
+            }else{
+                if(colom == "betekenis"){
+                    DisplayLinks.veld1 = "ro"
+                    OplossingLinks.Oploss1 = "be"
+                    OplossingLinks.Oploss2 = "ka"
+                    OplossingLinks.Oploss3 = "no"
+                    document.getElementById("Oploss3").hidden = false
+                }else{
+                    DisplayLinks.veld1 = "ka"
+                    DisplayLinks.veld2 = "be"
+                    OplossingLinks.Oploss1 = "ro"
+                    OplossingLinks.Oploss2 = "no"
+                    document.getElementById("veld2").hidden = false
+                }
+                document.getElementById("Oploss2").hidden = false
+            }
+            window.addEventListener('beforeunload', function (e) {
+                if (mt == false) {
+                    // Cancel the event and show alert that
+                    // the unsaved changes would be lost
+                    e.preventDefault();
+                    e.returnValue = '';
+                }
+            });
+        }
+        const getNewQuestions = function(cb){
+            GetDataPost(serverAddress+apiAdditions+"generate100/"+groepid+"/"+tabel+"/"+colom,function(ret){
+                    OpgevraagdeData = ret
+                    listIndex = 0;
+                    if(ret.length>100){
+                        alert("database error")
+                    }
+                    if(ret.length==0){
+                        return
+                    }
+                    if(cb){
+                        cb()
+                    }
+                })
+        }
+        const returnResults = function(cb, args){
+            if(mt){
+                if(cb){
+                    cb(args)
+                }
+                console.log("hier")
+                return
+            }
+            var httpp = new XMLHttpRequest();
+            httpp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    console.log(httpp.responseText)
+                    var parsed = JSON.parse(httpp.responseText)
+                        ReturnData = {}
+                        mt = true
+                        if(cb){
+                            cb(args)
+                        }
+                }
+            };
+            var url = serverAddress+apiAdditions+"returnResult/"+tabel+"/"+colom+"/"+getPassword()
+            httpp.open('POST', url, false);
+            httpp.send(JSON.stringify(ReturnData));
+        }
+        const displayNextQuestion = function() {
+            if(listIndex == OpgevraagdeData.length){
+                returnResults(getNewQuestions,function(){
+                    currentQ = OpgevraagdeData[listIndex]
+                    DisplayData()
+                    listIndex++;
+                });
+            }else{
+                currentQ = OpgevraagdeData[listIndex]
+                DisplayData()
+                listIndex++;
+            }
+        }
+        const DisplayData = function(){
+            document.getElementById("tabel").hidden = true
+            document.getElementById("veld1").style.color = "#000000"
+            document.getElementById("veld1").value = currentQ[DisplayLinks.veld1];
+            if(DisplayLinks.veld2 != undefined){
+                document.getElementById("veld2").value = currentQ[DisplayLinks.veld2];
+            }
+            if(DisplayLinks.handzuimg != undefined){
+                //console.log(decodeURI(data[DisplayLinks.handzuimg]))
+                document.getElementById("handzuimg").src = serverAddress + apiIMGAdditions + currentQ[DisplayLinks.handzuimg];
+            }else{
+                document.getElementById("handzuimg").src = ""
+            }
+            document.getElementById("Oploss1").value = ""
+            document.getElementById("Oploss2").value = ""
+            document.getElementById("Oploss3").value = ""
+            document.getElementById("btnNext").style.display = "hidden"
+            document.getElementById("btnOploss").style.display = "block"
+            var rij = document.getElementsByClassName("btnRate")
+            for(var i = 0; i < rij.length; i++){
+                rij[i].style.display = "hidden"
+            }
+        }
+        const ToonOploss = function(){
+            if(OplossingLinks.handzuimg != undefined){
+                document.getElementById("handzuimg").src = serverAddress + apiIMGAdditions + currentQ[OplossingLinks.handzuimg];
+            }
+            if(OplossingLinks.Oploss1 != undefined){
+                document.getElementById("Oploss1").value = currentQ[OplossingLinks.Oploss1];
+            }
+            if(OplossingLinks.Oploss2 != undefined){
+                document.getElementById("Oploss2").value = currentQ[OplossingLinks.Oploss2];
+            }
+            if(OplossingLinks.Oploss3 != undefined){
+                document.getElementById("Oploss3").value = currentQ[OplossingLinks.Oploss3];
+            }
+            var rij = document.getElementsByClassName("btnRate")
+            for(var i = 0; i < rij.length; i++){
+                rij[i].style.display = "block"
+            }
+            document.getElementById("btnOploss").style.display = "hidden"
+            document.getElementById("btnNext").style.display = "block"
+            if(tabel == "woordenschat_tabel" && colom == "betekenis"){                
+                if(currentQ.sa != undefined){
+                    var tabelElement = document.getElementById("tabel")
+                    tabelElement.hidden = false
+                    var rowCount = tabelElement.rows.length;
+                    for (var i = 1; i < rowCount; i++) {
+                        tabelElement.deleteRow(1);
+                    }
+                    for(var index = 0; index < currentQ.sa.length; index++){
+                        var newrow = tabelElement.insertRow(index+1)
+                        var cel1 = newrow.insertCell(0);
+                        cel1.appendChild(document.createTextNode(currentQ.sa[index].betekenis))
+                    }
+                }
+            }
+        }
+        const rate = function(reslt){
+            ReturnData[currentQ["id"]] = reslt
+            mt = false
+            if(reslt=="goed"){
+                document.getElementById("veld1").style.color = "#00ff00"
+            }else{
+                document.getElementById("veld1").style.color = "#ff0000"
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="css/algemeen.css">
+</head>
+<body onload="prepare()">
+    <div class="container">
+        <form id="ioform">
+            <textarea id="veld1" readonly></textarea>
+            <textarea id="veld2" readonly hidden></textarea>
+            <div>
+                <img src="" alt="" id="handzuimg" hidden>
+            </div>
+            <textarea id="Oploss1" readonly></textarea>
+            <textarea id="Oploss2" readonly hidden></textarea>
+            <textarea id="Oploss3" readonly hidden></textarea>
+            <input type="button" onclick="ToonOploss()" id="btnOploss" value="Toon oplossing" class="klikbaar" hidden>
+            <div style="display: flex; justify-content: space-between;">
+                <input type="button" onclick="rate('goed')" id="goodrate" class="btnRate klikbaar" hidden value="Goed">
+                <input type="button" onclick="rate('fout')" id="badrate" class="btnRate klikbaar" hidden value="Fout">
+            </div>
+            <input type="button" onclick="displayNextQuestion()" id="btnNext" class="klikbaar" value="Volgende Vraag">
+            <input type="button" onclick="returnResults()" id="btnSVE" class="klikbaar" value="save">
+        </form>
+        <table id="tabel" hidden>
+            <tr>
+                <th>Andere betekenissen:</th>
+            </tr>
+        </table>
+    </div>
+</body>
+<style>
+#ioform{
+    display: flex;
+    flex-direction: column;
+}
+#ioform > *{
+    margin: 5px;
+}
+.btnRate{
+    width:45%;
+}
+</style>
+</html>
