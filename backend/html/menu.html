@@ -44,7 +44,7 @@
         }
         const DirectStudy = function(){
             var url = "study.html?"
-            if(document.getElementById("expMode").checked){
+            if(document.getElementById("mobMod").checked){
                 url = "studieMobiel.html?"
             }
             url += document.getElementById("Kanjimode").value+"?"+document.getElementById("richtingmode").value+"?"+document.getElementById("groepen").value
@@ -75,7 +75,7 @@
                 <select id="richtingmode" disabled class="klikbaar"></select><br>
                 <p>welke groep?</p>
                 <select id="groepen" disabled class="klikbaar"></select><br>
-                <label>Experimentele nieuwe mode:</label><input type="checkbox" id="expMode"><br>
+                <label>Mobiele modus:</label><input type="checkbox" id="mobMod"><br>
                 <button onclick="DirectStudy()" id="studiebtn" class="klikbaar" disabled>start Studie</button>
             </div>
         </div>

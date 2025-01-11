@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <title>Pagina 2</title>
     <script src="./lib/tools.js"></script>
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+    <link rel="stylesheet" href="css/algemeen.css">
+
     <script>
         var tabel = ""
         var groepid = ""
@@ -107,11 +110,15 @@
                     currentQ = OpgevraagdeData[listIndex]
                     DisplayData()
                     listIndex++;
+                    document.getElementById("btnChangHist").disabled = true;
+                    document.getElementById("labelVorige").textContent = "Vorige antwoord:";
                 });
             }else{
+                document.getElementById("labelVorige").textContent = "Vorige antwoord: " + ReturnData[currentQ["id"]];
                 currentQ = OpgevraagdeData[listIndex]
                 DisplayData()
                 listIndex++;
+                document.getElementById("btnChangHist").disabled = false;
             }
         }
         const DisplayData = function(){
@@ -130,11 +137,11 @@
             document.getElementById("Oploss1").value = ""
             document.getElementById("Oploss2").value = ""
             document.getElementById("Oploss3").value = ""
-            document.getElementById("btnNext").style.display = "hidden"
-            document.getElementById("btnOploss").style.display = "block"
+            document.getElementById("btnNext").hidden = true
+            document.getElementById("btnOploss").hidden = false
             var rij = document.getElementsByClassName("btnRate")
             for(var i = 0; i < rij.length; i++){
-                rij[i].style.display = "hidden"
+                rij[i].hidden = true
             }
         }
         const ToonOploss = function(){
@@ -152,10 +159,10 @@
             }
             var rij = document.getElementsByClassName("btnRate")
             for(var i = 0; i < rij.length; i++){
-                rij[i].style.display = "block"
+                rij[i].hidden = false
             }
-            document.getElementById("btnOploss").style.display = "hidden"
-            document.getElementById("btnNext").style.display = "block"
+            document.getElementById("btnOploss").hidden = true
+            document.getElementById("btnNext").hidden = false
             if(tabel == "woordenschat_tabel" && colom == "betekenis"){                
                 if(currentQ.sa != undefined){
                     var tabelElement = document.getElementById("tabel")
@@ -181,13 +188,22 @@
                 document.getElementById("veld1").style.color = "#ff0000"
             }
         }
+        const toggleVorige = function() {
+            let idx = OpgevraagdeData[listIndex-2].id
+            let v = ReturnData[idx]
+            let nv = "goed"
+            if(v == "goed"){
+                nv = "fout"
+            }
+            ReturnData[idx] = nv
+            document.getElementById("labelVorige").textContent = "Vorige antwoord: " + nv;
+        }
     </script>
-    <link rel="stylesheet" href="css/algemeen.css">
 </head>
-<body onload="prepare()">
-    <div class="container">
+<body onload="prepare()" style="width: 100%">
+    <div style="background-color:rgba(242, 247, 255, 0.89);">
         <form id="ioform">
-            <textarea id="veld1" readonly></textarea>
+            <textarea id="veld1" readonly style="margin-top: 0px"></textarea>
             <textarea id="veld2" readonly hidden></textarea>
             <div>
                 <img src="" alt="" id="handzuimg" hidden>
@@ -196,7 +212,7 @@
             <textarea id="Oploss2" readonly hidden></textarea>
             <textarea id="Oploss3" readonly hidden></textarea>
             <input type="button" onclick="ToonOploss()" id="btnOploss" value="Toon oplossing" class="klikbaar" hidden>
-            <div style="display: flex; justify-content: space-between;">
+            <div style="display: flex; justify-content: space-between; margin: 0px">
                 <input type="button" onclick="rate('goed')" id="goodrate" class="btnRate klikbaar" hidden value="Goed">
                 <input type="button" onclick="rate('fout')" id="badrate" class="btnRate klikbaar" hidden value="Fout">
             </div>
@@ -208,6 +224,10 @@
                 <th>Andere betekenissen:</th>
             </tr>
         </table>
+        <div>
+            <p id="labelVorige" style="font-size: 1.2em;">Vorige antwoord: </p>
+            <input type="button" value="Toggle vorige" onclick="toggleVorige()" disabled id="btnChangHist"/>
+        </div>
     </div>
 </body>
 <style>
@@ -216,10 +236,17 @@
     flex-direction: column;
 }
 #ioform > *{
-    margin: 5px;
+    margin: 5px 0px;
 }
 .btnRate{
     width:45%;
+}
+textarea {
+    font-size: 1.2em;
+}
+input {
+    font-size: 1.2em;
+    padding: 5px;
 }
 </style>
 </html>
