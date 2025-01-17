@@ -189,14 +189,19 @@
             }
         }
         const toggleVorige = function() {
+            
             let idx = OpgevraagdeData[listIndex-2].id
-            let v = ReturnData[idx]
-            let nv = "goed"
-            if(v == "goed"){
-                nv = "fout"
+            if(Object.keys(ReturnData).length != 0){
+                console.log("toggelen")
+                let v = ReturnData[idx]
+                let nv = "goed"
+                if(v == "goed"){
+                    nv = "fout"
+                }
+                ReturnData[idx] = nv
+                document.getElementById("labelVorige").textContent = "Vorige antwoord: " + nv;
+                mt = false
             }
-            ReturnData[idx] = nv
-            document.getElementById("labelVorige").textContent = "Vorige antwoord: " + nv;
         }
     </script>
 </head>
